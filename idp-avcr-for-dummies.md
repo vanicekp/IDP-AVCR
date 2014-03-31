@@ -21,6 +21,12 @@ cp /opt/templates/apache/idp-xxx.conf /etc/httpd/virtuals.d/idp-foo.conf
 
 V nově vytvořeném souboru `idp-foo.conf` nastavíme proměnnou `{HOSTNAME}` na **idp.foo.cas.cz**.
 
+Dále je třeba založit adresář pro logy
+
+```
+mkdir /var/log/httpd/idp.foo.cas.cz
+```
+
 Pro aktivaci změn musíme Apache restartovat:
 
 ```
