@@ -50,6 +50,11 @@ Vytvoříme příslušný adresář:
 mkdir /etc/tomcat6/Catalina/idp.foo.cas.cz
 ```
 
+Změníme vlastníka
+```
+chown tmomcat /etc/tomcat6/Catalina/idp.foo.cas.cz
+````
+
 Pro aktivaci změn muséme Tomcat restartovat:
 
 ```
@@ -95,7 +100,9 @@ V souboru `$IDP_SRC/src/main/webapp/WEB-INF/web.xml` je potřeba v definici serv
 
 ### Přihlašovací stránka
 
-Přihlašovací stránku upravíme editací souboru `$IDP_SRC/src/main/webapp/login.jsp`.
+Přihlašovací stránku upravíme editací souboru  `$IDP_SRC/ src/main/webapp/login.jsp`
+
+Logo je v adresáři `$IDP_SRC/ src/main/webapp/limages`
 
 ### Instalace
 
@@ -147,6 +154,8 @@ Bylo by také vhodné, když už IdP podporuje persistentní ID, promítnout to 
 
 Pro inspiraci se můžete podívat na příklad metadat pro SSC AVČR - `/opt/templates/metadata/idp.ssc.cas.cz-metadata.xml`.
 
+Loga dáváme do adresáře `/var/www/html/loga`
+
 ### Konfigurace
 
 #### login.config
@@ -181,7 +190,8 @@ V souboru `$IDP_HOME/conf/handler.xml` je potřeba odkomentovat _UsernamePasswor
 </ph:LoginHandler>
 ```
 
-Anebo je možné použít rovnou šablonu `/opt/templates/shibboleth/handler.xml` bez dalších úprav:
+Anebo je možné použít rovnou šablonu `/opt/templates/shibboleth/handler.xml` ,  POZOr  třeba nastavit správně hodnotu místo proměné {HOSTNAME}
+
 
 ```
 cp /opt/templates/shibboleth/handler.xml $IDP_HOME/conf
