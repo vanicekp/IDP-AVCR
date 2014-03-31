@@ -190,7 +190,7 @@ V souboru `$IDP_HOME/conf/handler.xml` je potřeba odkomentovat _UsernamePasswor
 </ph:LoginHandler>
 ```
 
-Anebo je možné použít rovnou šablonu `/opt/templates/shibboleth/handler.xml` ,  POZOr  třeba nastavit správně hodnotu místo proměné {HOSTNAME}
+Anebo je možné použít rovnou šablonu `/opt/templates/shibboleth/handler.xml` ,  POZOR je třeba  nastavit hodnotu proměné {HOSTNAME} na idp.foo.cas.cz.
 
 
 ```
@@ -200,6 +200,12 @@ cp /opt/templates/shibboleth/handler.xml $IDP_HOME/conf
 #### logging.xml
 
 V souboru `$IDP_HOME/conf/logging.xml` je dobré nastavit během konfigurace logování na _INFO_ nebo _DEBUG_. Píše to sice spoustu balastu (zvlášť pod _DEBUG_), ale pomůže to diagnostikovat případné problémy.
+
+Pozor musí se nastavit práva na adresář `$IDP_HOME/logs`
+
+```
+mkdir tomcat $IDP_HOME/logs
+```
 
 #### relying-party.xml
 
@@ -219,8 +225,11 @@ chown tomcat $IDP_HOME/metadata/backup
 
 Pro soubor `$IDP_HOME/conf/attribute-resolver.xml` lze použít šablonu `/opt/templates/attribute-resolver.xml` a nahradit "proměnné":
 
-* SCOPE - příslušna hodnota _Scope_ tak, jak je uvedena v metadatech (viz výše), např. pro instanci _idp.ssc.cas.cz_ je to `ssc.cas.cz`.
+* SCOPE - příslušna hodnota _Scope_ tak, jak je uvedena v metadatech (viz výše), např. pro instanci _idp.ssc.cas.cz_ je to `ssc.cas.cz`. A je to tam 3x.
 * ORGANIZATION - název organizace pro nastavení statického atributu
+* XXXXX - na modifikaci jména scriptu `eduPersonEntitlementXxxx.js` 
+
+A zkopírovat script s příslušným jménem a modifikovat hodnotu/y unstructuredname.
 
 #### attribute-filter.xml
 
