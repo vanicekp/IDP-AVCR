@@ -13,6 +13,8 @@ Předpoklady:
 
 ## Apache
 
+Ověříme dostupnost CNAME idp.foo,.as,.z
+
 Vytvoříme nový virtuál na základě šablony `/opt/templates/apache/idp-xxx.conf`:
 
 ```
@@ -52,7 +54,7 @@ mkdir /etc/tomcat6/Catalina/idp.foo.cas.cz
 
 Změníme vlastníka
 ```
-chown tmomcat /etc/tomcat6/Catalina/idp.foo.cas.cz
+chown tomcat /etc/tomcat6/Catalina/idp.foo.cas.cz
 ````
 
 Pro aktivaci změn muséme Tomcat restartovat:
