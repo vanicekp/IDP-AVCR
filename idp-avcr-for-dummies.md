@@ -102,7 +102,7 @@ V souboru `$IDP_SRC/src/main/webapp/WEB-INF/web.xml` je potřeba v definici serv
 
 ### Přihlašovací stránka
 
-Přihlašovací stránku upravíme editací souboru  `$IDP_SRC/ rc/main/webapp/login.jsp`
+Přihlašovací stránku upravíme editací souboruu 
 
 Logo je v adresáři `$IDP_SRC/src/main/weapp/images`
 
