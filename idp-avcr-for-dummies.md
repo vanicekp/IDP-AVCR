@@ -235,8 +235,10 @@ Pro soubor `$IDP_HOME/conf/attribute-resolver.xml` lze použít šablonu `/opt/t
 * PREFIX - podobně jsko v login.config je potřeba použít dvojčíslí pro danou součást AVČR (například pro ÚTIA je to 15, pro SSČ je to 47)
 * XXXXX - na modifikaci jména scriptu `eduPersonEntitlementXxxx.js` 
 
-A zkopírovat script s příslušným jménem a modifikovat hodnotu/y unstructuredname.
-
+A zkopírovat script s příslušným jménem a modifikovat hodnotu/y unstructuredName.
+```
+cp /opt/idp/common/script/eduPersonEntitlementUtia.js /opt/idp/common/script/eduPersonEntitlementfoo.js
+```
 #### attribute-filter.xml
 
 Pro soubor `$IDP_HOME/conf/attribute-filter.xml` lze použít šablonu `/opt/templates/shibboleth/attribute-filter.xml` bez nutnosti dalších úprav.
