@@ -130,7 +130,7 @@ What is the fully qualified hostname of the Shibboleth Identity Provider server?
 idp.foo.cas.cz
 A keystore is about to be generated for you. Please enter a password that will be used to protect it.
 heslo
-```
+
 
 Pro jednoduchost si uložíme adresář s instalaci Shibboleth IdP do proměnné `IDP_HOME`:
 
