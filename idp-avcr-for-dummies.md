@@ -227,7 +227,7 @@ chown tomcat $IDP_HOME/metadata/backup
 
 #### attribute-resolver.xml
 
-Pro soubor `$IDP_HOME/conf/attribute-resolver.xml` lze použít šablonu `/opt/templates/attribute-resolver.xml` a nahradit "proměnné":
+Pro soubor `$IDP_HOME/conf/attribute-resolver.xml` lze použít šablonu `/opt/templates/shibboleth/attribute-resolver.xml` a nahradit "proměnné":
 
 * SCOPE - příslušna hodnota _Scope_ tak, jak je uvedena v metadatech (viz výše), např. pro instanci _idp.ssc.cas.cz_ je to `ssc.cas.cz`. A je to tam 3x.
 * ORGANIZATION - název organizace pro nastavení statického atributu
