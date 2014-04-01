@@ -13,7 +13,7 @@ Předpoklady:
 
 ## Apache
 
-Ověříme dostupnost CNAME idp.foo,cas.cz
+Ověříme dostupnost CNAME  idp.foo.cas.cz
 
 Vytvoříme nový virtuál na základě šablony `/opt/templates/apache/idp-xxx.conf`:
 
