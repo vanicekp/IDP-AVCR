@@ -83,7 +83,7 @@ export IDP_SRC=/opt/dist/idp.foo.cas.cz-source
 Zkopírujeme MySQL knihovnu do adresáře `$IDP_SRC/lib/`:
 
 ```
-cp /opt/dist/lib/mysql-connector-java-5.x.x.jar $IDP_SRC/lib/
+cp /opt/dist/lib/mysql-connector-java-x.x.x/mysql-connector-java-5.x.x.jar $IDP_SRC/lib/
 ```
 
 V souboru `$IDP_SRC/src/main/webapp/WEB-INF/web.xml` je potřeba v definici servletu _UsernamePasswordAuthHandler_ přidat u parametru _jaasConfigName_ nějakou unikátní hodnotu, což v našem případě může být **ShibUserPassAuthFoo** (prakticky to znamená, že přidáme celou sekci _init-param_, která ve výchozím stavu souboru chybí):
