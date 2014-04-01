@@ -192,7 +192,9 @@ V souboru `$IDP_HOME/conf/handler.xml` je potřeba odkomentovat _UsernamePasswor
 </ph:LoginHandler>
 ```
 
-Anebo je možné použít rovnou šablonu `/opt/templates/shibboleth/handler.xml` ,  POZOR je třeba  nastavit hodnotu proměné {HOSTNAME} na idp.foo.cas.cz.
+Anebo je možné použít rovnou šablonu `/opt/templates/shibboleth/handler.xml` ,  
+
+POZOR je třeba  nastavit hodnotu proměné {HOSTNAME} na idp.foo.cas.cz.
 
 
 ```
@@ -206,7 +208,7 @@ V souboru `$IDP_HOME/conf/logging.xml` je dobré nastavit během konfigurace log
 Pozor musí se nastavit práva na adresář `$IDP_HOME/logs`
 
 ```
-mkdir tomcat $IDP_HOME/logs
+chown tomcat $IDP_HOME/logs
 ```
 
 #### relying-party.xml
