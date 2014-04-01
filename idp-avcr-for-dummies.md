@@ -231,6 +231,7 @@ Pro soubor `$IDP_HOME/conf/attribute-resolver.xml` lze použít šablonu `/opt/t
 
 * SCOPE - příslušna hodnota _Scope_ tak, jak je uvedena v metadatech (viz výše), např. pro instanci _idp.ssc.cas.cz_ je to `ssc.cas.cz`. A je to tam 3x.
 * ORGANIZATION - název organizace pro nastavení statického atributu
+* PREFIX - podobně jsko v login.config je potřeba použít dvojčíslí pro danou součást AVČR (například pro ÚTIA je to 15, pro SSČ je to 47)
 * XXXXX - na modifikaci jména scriptu `eduPersonEntitlementXxxx.js` 
 
 A zkopírovat script s příslušným jménem a modifikovat hodnotu/y unstructuredname.
