@@ -104,7 +104,7 @@ V souboru `$IDP_SRC/src/main/webapp/WEB-INF/web.xml` je potřeba v definici serv
 
 Přihlašovací stránku upravíme editací souboru  `$IDP_SRC/ src/main/webapp/login.jsp`
 
-Logo je v adresáři `$IDP_SRC/ src/main/webapp/limages`
+Logo je v adresáři `$IDP_SRC/ rc/main/webapp/limages`
 
 ### Instalace
 
