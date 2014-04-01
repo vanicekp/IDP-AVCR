@@ -118,6 +118,7 @@ Spustíme instalační skript:
 
 ```
 cd $IDP_SRC
+./install.sh
 * cílový adresář - `/opt/idp/idp.foo.cas.cz`
 * hostname - `idp.foo.cas.cz`
 * heslo do keystore - libovolná hodnota, keystore se prakticky nepoužívá
