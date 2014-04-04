@@ -169,7 +169,7 @@ Do souboru `/opt/idp/common/conf/login.config` je potřeba přidat konfiguraci p
 // idp.foo.cas.cz
 ShibUserPassAuthFoo {
    edu.vt.middleware.ldap.jaas.LdapLoginModule required
-      ldapUrl="ldaps://fis1.eis.cas.cz:3232"
+      ldapUrl="ldaps://oid1.eis.cas.cz:3132"
       baseDn="cn=Users,dc=eis,dc=cas,dc=cz"
       userFilter="(&(cn={0})(employeenumber={PREFIX}*)(businesscategory=EduID))";
 };
