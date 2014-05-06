@@ -175,6 +175,24 @@ ShibUserPassAuthFoo {
 };
 ```
 
+Pokud nastane situace že ústav používá více číselných řad PREFIXů, je třeba jiný zápis:
+
+```
+// idp.foo.cas.cz
+ShibUserPassAuthFoo {
+   edu.vt.middleware.ldap.jaas.LdapLoginModule sufficient
+      ldapUrl="ldaps://oid1.eis.cas.cz:3132"
+      baseDn="cn=Users,dc=eis,dc=cas,dc=cz"
+      userFilter="(&(cn={0})(employeenumber={PREFIX1}*)(businesscategory=EduID))";
+
+   edu.vt.middleware.ldap.jaas.LdapLoginModule sufficient
+      ldapUrl="ldaps://oid1.eis.cas.cz:3132"
+      baseDn="cn=Users,dc=eis,dc=cas,dc=cz"
+      userFilter="(&(cn={0})(employeenumber={PREFIX2}*)(businesscategory=EduID))";
+
+};
+```
+
 **Pozor:** Je potřeba nastavit hodnotu `{PREFIX}` na dvojčíslí odpovídající dané součásti AVČR. Například pro SSC AVČR hodnota _userFilter_ vypadá takto:
 
 ```
@@ -238,6 +256,12 @@ Pro soubor `$IDP_HOME/conf/attribute-resolver.xml` lze použít šablonu `/opt/t
 A zkopírovat script s příslušným jménem a modifikovat hodnotu/y unstructuredName.
 ```
 cp /opt/idp/common/script/eduPersonEntitlementUtia.js /opt/idp/common/script/eduPersonEntitlementfoo.js
+```
+
+Pokud nastane situace že ústav používá více číselných řad PREFIXů, je třeba u atributu unstructuredName
+doplnit řádek 
+```
+<ad:SourceValue>PREFIX2(.+)</ad:SourceValue>
 ```
 #### attribute-filter.xml
 
