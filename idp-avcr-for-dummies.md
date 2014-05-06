@@ -295,10 +295,3 @@ Pokud změníme něco v konfiguraci, je potřeba restartovat Tomcat.
 
 Pokud změníme něco v zdrojovém adresáři `$IDP_SRC`, například upravíme přihlašovací stránku, je potřeba znovu spustit instalační skript `install.sh`. Ten se zeptá opět na cílový adresář, ale už by nám měl nabídnout adresář, kde byla instance už nainstalovaná, takže stačí volbu odklepnout. Skript pak zjistí, že v daném adresáři už byla provedena instalace a zeptá
 se zda se má přepsat konfigurace. Odpovíme záporně (je to výchozí volba) a poté skript přepíše pouze binární soubory. Tomcat by měl detekovat změnu automaticky a restartovat aplikaci. Pokud se tak nestane, restartujte Tomcat ručně.
-
-
-
-./install.sh
-```
-
-Skript po nás chce některé údaje. Nastavíme tyto hodnoty:
