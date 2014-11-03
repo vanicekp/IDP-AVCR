@@ -171,7 +171,7 @@ ShibUserPassAuthFoo {
    edu.vt.middleware.ldap.jaas.LdapLoginModule required
       ldapUrl="ldaps://oid1.eis.cas.cz:3132"
       baseDn="cn=Users,dc=eis,dc=cas,dc=cz"
-      userFilter="(&(cn={0})(employeenumber={PREFIX}*)(businesscategory=EduID)orclisenabled=ENABLED)");
+      userFilter="(&(cn={0})(employeenumber={PREFIX}*)(businesscategory=EduID)(orclisenabled=ENABLED))";
 };
 ```
 
@@ -186,12 +186,12 @@ ShibUserPassAuthFoo {
    edu.vt.middleware.ldap.jaas.LdapLoginModule sufficient
       ldapUrl="ldaps://oid1.eis.cas.cz:3132"
       baseDn="cn=Users,dc=eis,dc=cas,dc=cz"
-      userFilter="(&(cn={0})(employeenumber={PREFIX1}*)(businesscategory=EduID))";
+      userFilter="(&(cn={0})(employeenumber={PREFIX1}*)(businesscategory=EduID)(orclisenabled=ENABLED))";
 
    edu.vt.middleware.ldap.jaas.LdapLoginModule sufficient
       ldapUrl="ldaps://oid1.eis.cas.cz:3132"
       baseDn="cn=Users,dc=eis,dc=cas,dc=cz"
-      userFilter="(&(cn={0})(employeenumber={PREFIX2}*)(businesscategory=EduID))";
+      userFilter="(&(cn={0})(employeenumber={PREFIX2}*)(businesscategory=EduID)(orclisenabled=ENABLED))";
 
 };
 ```
