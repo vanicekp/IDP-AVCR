@@ -171,9 +171,12 @@ ShibUserPassAuthFoo {
    edu.vt.middleware.ldap.jaas.LdapLoginModule required
       ldapUrl="ldaps://oid1.eis.cas.cz:3132"
       baseDn="cn=Users,dc=eis,dc=cas,dc=cz"
-      userFilter="(&(cn={0})(employeenumber={PREFIX}*)(businesscategory=EduID))";
+      userFilter="(&(cn={0})(employeenumber={PREFIX}*)(businesscategory=EduID)orclisenabled=ENABLED)");
 };
 ```
+
+Pokud nastanesituace že se rozhodneme zpřístupnit eduID všem tak z  předochozí konfigurace odstraníme  podmínku
+`businesscategory=EduID`
 
 Pokud nastane situace že ústav používá více číselných řad PREFIXů, je třeba jiný zápis:
 
