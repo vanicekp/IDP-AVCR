@@ -256,6 +256,22 @@ Pro soubor `$IDP_HOME/conf/attribute-resolver.xml` lze použít šablonu `/opt/t
 * PREFIX - podobně jsko v login.config je potřeba použít dvojčíslí pro danou součást AVČR (například pro ÚTIA je to 15, pro SSČ je to 47)
 * XXXXX - na modifikaci jména scriptu `eduPersonEntitlementXxxx.js` 
 
+
+Pro konfiguraci bez eduID parametru v LDAPu  je třeba doplnit 
+```
+<resolver:AttributeDefinition xsi:type="ad:Simple" id="uniqueIdentifier" sourceAttributeID="businesscategory">
+        <resolver:Dependency ref="myLDAP" />
+        <resolver:AttributeEncoder xsi:type="enc:SAML1String" name="urn:mace:dir:attribute-def:uniqueIdentifier" />
+        <resolver:AttributeEncoder xsi:type="enc:SAML2String" name="urn:oid:0.9.2342.19200300.100.1.44" friendlyName="uniqueIdentifier" />
+    </resolver:AttributeDefinition>
+````
+ a v definici    ` <!-- eduPersonEntitlement pro TCS-P -->` doplnit řádek
+ ```
+         <resolver:Dependency ref="uniqueIdentifier" />
+```
+jinak nechodí nové scripty.
+
+
 A zkopírovat script s příslušným jménem a modifikovat hodnotu/y unstructuredName.
 ```
 cp /opt/idp/common/script/eduPersonEntitlementUtia.js /opt/idp/common/script/eduPersonEntitlementfoo.js
