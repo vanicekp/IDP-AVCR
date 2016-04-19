@@ -6,7 +6,7 @@ http://shibboleth.net/downloads/identity-provider/
 ```
 ### příkazy zadané do terminálu:
 ``` 
-cd /opt
+cd /opt/src
 tar -xzf src/shibboleth-identity-provider-3.1.2.tar.gz
 ```
 ### Příprava instalace
