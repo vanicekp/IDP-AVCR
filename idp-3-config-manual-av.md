@@ -98,10 +98,18 @@ Editujeme:
         p:allowedRanges="#{ {'127.0.0.1/32', '::1/128', '147.231.12.0/22'} }" />
 </entry>
 ```
+### Perzonifikace loga pro identifikaci virtuálu
+Do adresáře /opt/idp/idp.foo.cas.cz/edit-webapp/images dáme místo prázdného loga logo pro rozlišení virtuálu při chyboových hláškách, v opačném případě nepoznáme který virtuál vygeneroval chybu, není to na stránce napsané.
+```
+cp  ~/loga/foo.png edit-webapp/images/dummylogo.png
+./bin/build.sh
+Installation Directory: [/opt/idp/idp.test.cas.cz]
+```
+
 ## Konfigurace Jetty virtuálu
 Připravíme si konfigurační soubor idp.xml, pomocí něhož definujeme, který WAR (Web application ARchive) bude obsahovat webovou aplikaci našeho IdP a na jaké adrese (v tomto případě https://HOSTNAME_SERVERU/idp) bude přes web IdP naslouchat.
 
-# příkaz zadaný do terminálu:
+### příkaz zadaný do terminálu:
 ``` 
 vi /opt/jetty/webapps/idp.foo.cas.cz.xml
 ```
