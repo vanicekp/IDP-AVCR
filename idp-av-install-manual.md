@@ -20,7 +20,9 @@ echo export JAVA_HOME=/opt/jdk1.8.0_77 >> ~/.bashrc
 O korektním nastavení právě nainstalovaného Oracle JDK se můžeme přesvědčit následovně.
 
 ### Příkaz pro zobrazení aktuálně využívané verze Javy
+```
 alternatives --display java
+```
 
 ### Výstup příkazu pro zobrazení aktuálně využívané verze Javy
 ```
@@ -57,7 +59,9 @@ source ~/.bashrc && echo $JAVA_HOME
 Po nainstalování Oracle JDK je ještě potřeba doinstalovat tzv. JCE US (Java Cryptography Extension Unlimited Strength), které zajistí možnost využít silnější šifrování.
 
 Stáhneme JCE a umístíme jej do adresáře /opt/src.
-```http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html```
+```
+http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html`
+```
 ### Rozbalení archivu s JCE US
 ```
 cd /opt
