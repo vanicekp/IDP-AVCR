@@ -157,115 +157,102 @@ Tímto máme Jetty téměř připraveno. Zatím jej však nebudeme pouštět, je
 
 Nyní je ještě potřeba nakonfigurovat použití SSL certifikátu v Jetty, aby bylo možné provozovat Shibboleth IdP přes HTTPS. K tomuto účelu slouží u Javy tzv. „keystore“. Pro korektní zprovoznění HTTPS je potřeba, aby se do klíčenky („keystore“) uložil SSL certifikát včetně kompletního řetězce až ke kořenovému certifikátu certifikační autority (CA).
 
-Následující návod je pro SSL certifikát získaný pomocí služby TCS CESNET. Soubor cert.pem obsahuje cílový certifikát pro server whoami-dev.cesnet.cz a chain_TERENA_SSL_CA_2.pem obsahuje řetězec certifikátů až k samotnému kořenovému CA. Certifikát pro server nejprve sloučíme s kompletním řetězcem:
+Následující návod je pro SSL certifikát získaný pomocí služby TCS CESNET. Soubor cert.pem obsahuje cílový certifikát pro server whoami-dev.cesnet.cz a chain_TERENA_SSL_CA_3.pem obsahuje řetězec certifikátů až k samotnému kořenovému CA. Certifikát pro server nejprve sloučíme s kompletním řetězcem:
 
-# příkaz zadaný do terminálu:
- 
-cat cert.pem chain_TERENA_SSL_CA_2.pem >> jetty-cert.txt
-
+### příkaz zadaný do terminálu:
+``` 
+cat cert.pem chain_TERENA_SSL_CA_3.pem >> jetty-cert.txt
+```
 Nyní převedeme certifikát s kompletním řetězcem až k CA do formátu PKCS #12. Budeme požádáni o heslo ke klíči (soubor key.pem) a následně budeme požádáni o nové heslo k souboru jetty-cert.pkcs12.
 
-# příkaz zadaný do terminálu:
- 
+### příkaz zadaný do terminálu:
+``` 
 openssl pkcs12 -export -inkey key.pem -in jetty-cert.txt -out jetty-cert.pkcs12
-
-# výstup příkazu:
- 
+```
+### výstup příkazu:
+``` 
 Enter pass phrase for serverkey.pem:
 Enter Export Password:
 Verifying - Enter Export Password:
-
+```
 Nyní certifikát včetně kořene ve formátu PKCS #12 (soubor jetty-cert.pkcs12) importujeme do „klíčenky“ Java keystore:
 
-# příkaz zadaný do terminálu:
- 
+### příkaz zadaný do terminálu:
+``` 
 /opt/jdk1.8.0_60/bin/keytool -importkeystore -srckeystore jetty-cert.pkcs12 -srcstoretype PKCS12 -destkeystore keystore
-
+```
 Nejprve budeme požádáni o heslo k nově vytvářenému „keystore“ (Enter destination keystore password). Pak budeme požádáni o zopakování tohoto hesla (Re-enter new password). Následně budeme požádáni o heslo k certifikátu (soubor jetty-cert.pkcs12), který importujeme do „keystore“ (Enter source keystore password).
 
-# výstup příkazu:
- 
+### výstup příkazu:
+``` 
 Enter destination keystore password:  
 Re-enter new password: 
 Enter source keystore password:  
 Entry for alias 1 successfully imported.
 Import command completed:  1 entries successfully imported, 0 entries failed or cancelled
-
+```
 Následně je už jen potřeba keystore uložený v souboru keystore přesunout do Jetty:
 
-# příkaz zadaný do terminálu:
- 
+### příkaz zadaný do terminálu:
+``` 
 mv keystore /opt/jetty/etc
-
+```
 Předposledním krokem je vygenerovat si pomocí jetty-util, jež je součástí instalace Jetty, obfuskovanou podobu hesla pro přístup ke „keystore“ a pro přístup k certifikátu.
 
 Heslo ke keystore:
 
-# příkaz zadaný do terminálu:
- 
-java -cp /opt/jetty-distribution-9.3.2.v20150730/lib/jetty-util-9.3.2.v20150730.jar \
+### příkaz zadaný do terminálu:
+``` 
+java -cp /opt/jetty-distribution-9.3.8.v20160314/lib/jetty-util-9.3.8.v20160314.jar \
     org.eclipse.jetty.util.security.Password <heslo_ke_keystore>
-
-# výstup příkazu:
- 
+```
+### výstup příkazu:
+``` 
 2015-06-16 15:56:58.986:INFO::main: Logging initialized @322ms
 keystore
 OBF:1u9x1vn61z0p1yta1ytc1z051vnw1u9l
 MD5:5fba3d2b004d68d3c5ca4e174024fc81
-
+```
 Heslo k certifikátu (heslo, které jste použili při generování klíče k certifikátu):
 
-# příkaz zadaný do terminálu:
- 
-java -cp /opt/jetty-distribution-9.3.2.v20150730/lib/jetty-util-9.3.2.v20150730.jar \
+### příkaz zadaný do terminálu:
+``` 
+java -cp /opt/jetty-distribution-9.3.8.v20160314/lib/jetty-util-9.3.8.v20160314.jar \
     org.eclipse.jetty.util.security.Password <heslo_k_certifikátu>
-
-# výstup příkazu:
- 
+```
+### výstup příkazu:
+``` 
 2015-06-16 15:57:02.322:INFO::main: Logging initialized @308ms
 certificate
 OBF:1sot1w1c1uvk1vo01unz1thb1unz1vn21uum1w261sox
 MD5:e0d30cef5c6139275b58b525001b413c
-
+```
 Heslo (případně hesla) je potřeba zadat do souboru start.d/ssl.ini (jetty.keystore.password bude stejné jako jetty.truststore.password):
 
-# příkaz zadaný do terminálu:
- 
+### příkaz zadaný do terminálu:
+``` 
 vi /opt/jetty/start.d/ssl.ini
-
-# konfigurační změny v souboru 'ssl.ini'
- 
+```
+### konfigurační změny v souboru 'ssl.ini'
+``` 
 jetty.sslContext.keyStorePassword=OBF:1u9x1vn61z0p1yta1ytc1z051vnw1u9l
 jetty.sslContext.keyManagerPassword=OBF:1sot1w1c1uvk1vo01unz1thb1unz1vn21uum1w261sox
 jetty.sslContext.trustStorePassword=OBF:1u9x1vn61z0p1yta1ytc1z051vnw1u9l
-
+```
 Proměnné jetty.sslContext.keyStorePassword a jetty.sslContext.trustStorePassword nastavte na obfuskované heslo ke „keystore“. Proměnnou jetty.sslContext.keyManagerPassword nastavte na obfuskované heslo ke klíči certifikátu (soubor jetty-cert.pkcs12!). Pokud to popletete, Jetty odmítne nastartovat, jelikož nepřečte keystore a klíč.
 SSL konfigurace
 
 Výchozí konfigurace Jetty umožňuje použití i dnes již nepříliš důvěryhodných šifer. Proto jejich použití v konfiguraci zakážeme.
 
-# příkazy zadané do terminálu:
- 
+### příkazy zadané do terminálu:
+``` 
 cd /opt/jetty
-cp ../jetty-distribution-9.3.2.v20150730/etc/jetty-ssl-context.xml etc/
+cp ../jetty-distribution-9.3.8.v20160314/etc/jetty-ssl-context.xml etc/
 vi etc/jetty-ssl-context.xml
+```
+Konfigurační soubor jetty-ssl-context.xml, který jsme zkopírovali z distribučního adresáře Jetty,je treba doplnit o seznam zakázaných šifer:
 
-Konfigurační soubor jetty-ssl-context.xml, který jsme zkopírovali z distribučního adresáře Jetty, obsahuje seznam některých zakázaných šifer:
-
-<Set name="ExcludeCipherSuites">
-  <Array type="String">
-    <Item>SSL_RSA_WITH_DES_CBC_SHA</Item>
-    <Item>SSL_DHE_RSA_WITH_DES_CBC_SHA</Item>
-    <Item>SSL_DHE_DSS_WITH_DES_CBC_SHA</Item>
-    <Item>SSL_RSA_EXPORT_WITH_RC4_40_MD5</Item>
-    <Item>SSL_RSA_EXPORT_WITH_DES40_CBC_SHA</Item>
-    <Item>SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA</Item>
-    <Item>SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA</Item>
-  </Array>
-</Set>
-
-My však seznam zakázaných šifer upravíme následujícím způsobem:
-
+```
 <Set name="ExcludeCipherSuites">
   <Array type="String">
     <Item>.*NULL.*</Item>
@@ -277,9 +264,9 @@ My však seznam zakázaných šifer upravíme následujícím způsobem:
     <Item>TLS_DHE_RSA_WITH_AES_256.*</Item>
   </Array>
 </Set>
-
+```
 A nyní ještě zahrneme do konfigurace šifry pro podporu „Forward Secrecy“. Do konfiguračního souboru jetty-ssl-context.xml tedy těsně za předchozí nastavení vložíme tyto řádky:
-
+```
 <Set name="IncludeCipherSuites">
   <Array type="String">
     <Item>TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA</Item>
@@ -287,8 +274,7 @@ A nyní ještě zahrneme do konfigurace šifry pro podporu „Forward Secrecy“
     <Item>TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA</Item>
   </Array>
 </Set>
-
-Konfigurační soubor jetty-ssl-context.xml s těmito úpravami lze stáhnout.
+```
 
 S tímto nastavením by mělo být zabezpečení komunikace na výrazně vyšší úrovni.
 Shibboleth CLI skripty & HTTP
@@ -299,37 +285,37 @@ Druhou možností je spouštět skript reload-service.sh s parametrem -u, pomoc�
 
 Zprovoznění Jetty na HTTP je však triviální záležitostí pomocí několika následujících příkazů a konfiguračních úprav.
 
-# příkazy zadané do terminálu:
- 
+### příkazy zadané do terminálu:
+``` 
 cd /opt/jetty
-java -jar /opt/jetty-distribution-9.3.2.v20150730/start.jar --add-to-startd=http
-
+java -jar /opt/jetty-distribution-9.3.8.v20160314/start.jar --add-to-startd=http
+```
 V souboru start.d/http.ini provedeme dvě konfigurační změny.
 
-# příkaz zadaný do terminálu:
- 
+### příkaz zadaný do terminálu:
+``` 
 vi start.d/http.ini
-
+```
 Odkomentujeme proměnné jetty.http.host a jetty.http.port a nastavíme je na hodnoty 127.0.0.1 (výchozí 0.0.0.0), resp. 80 (výchozí 8080).
-
+```
 jetty.http.host=127.0.0.1
 jetty.http.port=80
-
+```
 Toto je velice důležité. Prosím, zkontrolujte, zda vám po restartu běží Jetty nešifrovaně (port 80) pouze na „localhostu“ (IP adresa 127.0.0.1) např. pomocí utility nestat:
 
-# příkazy zadané do terminálu:
- 
+### příkazy zadané do terminálu:
+``` 
 /etc/init.d/jetty start
 netstat -an | grep ":80"
-
+```
 Měl by se Vám zobrazit následující výstup.
 
-# výstup příkazu:
- 
+### výstup příkazu:
+```
 tcp6       0      0 127.0.0.1:80            :::*                    LISTEN     
-
+```
 Budete-li se dívat do logů Jetty, nelekejte se následující chyby, která se „táhne“ přes mnoho řádků. Je to v pořádku. Shibboleth IdP ještě není nainstalován, soubor idp.war tedy ještě neexistuje:
-
+```
 2015-08-05 09:02:22.871:WARN:oejw.WebInfConfiguration:main: Web application not found /opt/shibboleth-idp/war/idp.war
 2015-08-05 09:02:22.872:WARN:oejw.WebAppContext:main: Failed startup of context o.e.j.w.WebAppContext@df27fae{/idp,null,null}{/opt/shibboleth-idp/war/idp.war}
 java.io.FileNotFoundException: /opt/shibboleth-idp/war/idp.war
@@ -338,11 +324,11 @@ java.io.FileNotFoundException: /opt/shibboleth-idp/war/idp.war
         at org.eclipse.jetty.webapp.WebAppContext.preConfigure(WebAppContext.java:474)
         at org.eclipse.jetty.webapp.WebAppContext.doStart(WebAppContext.java:510)
 ...
-
+```
 Jetty je však možné předchozím příkazem nastartovat a ověřit, že v pořádku funguje. Vyzkoušejte přístup přes HTTPS ze svého počítače a případně i přístup přes HTTP z terminálu serveru:
 
-# příkaz zadaný do terminálu:
- 
+### příkaz zadaný do terminálu:
+``` 
 wget -q -O - http://127.0.0.1
-
+```
 Měli byste vidět obsah souboru /opt/jetty/webapps/root/index.html. 
