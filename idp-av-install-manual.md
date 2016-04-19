@@ -141,7 +141,7 @@ Obsah konfiguračního souboru /opt/jetty/webapps/idp.foo.cas.cz.xml je následu
     <Set name="contextPath">/idp</Set>
     <Set name="virtualHosts">
      <Array type="java.lang.String">
-      <Item>idp.test.cas.cz</Item>
+      <Item>idp.foo.cas.cz</Item>
      </Array>
     </Set>
     <Set name="extractWAR">false</Set>
