@@ -147,8 +147,12 @@ Obsah konfiguračního souboru /opt/jetty/webapps/idp.foo.cas.cz.xml je následu
     <Set name="extractWAR">false</Set>
     <Set name="copyWebDir">false</Set>
     <Set name="copyWebInf">true</Set>
-    <Set name="tempDirectory">/opt/jetty/tmp</Set>
+    <Set name="tempDirectory">/opt/jetty/tmp/idp.foo.cas.cz</Set>
 </Configure>
+```
+### Musíme založit adresář /opt/jetty/tmp
+```
+mkdir /opt/jetty/tmp
 ```
 
 Tímto máme Jetty téměř připraveno. Zatím jej však nebudeme pouštět, jelikož stejně nemáme nainstalovaný Shibboleth IdP a tedy idp.war zatím neexistuje. Navíc jsme ještě nenakonfigurovali SSL certifikát, aby bylo možné k Shibbolethu přistupovat přes HTTPS.
