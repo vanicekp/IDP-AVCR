@@ -285,7 +285,7 @@ Shibboleth CLI skripty & HTTP
 
 Chcete-li využívat Shibboleth CLI skripty (není potřeba, avšak vřele doporučuji, jelikož je možné požádat o „reload“ konfigurace z shellu serveru bez nutnosti restartovat celý javovský Jetty kontejner), je vhodné, aby byl Shibboleth dostupný i přes HTTP na localhosti (https://localhost/idp). Bezpečného řešení lze docílit spuštěním Jetty přes HTTP pouze na adrese lokálního rozhraní 127.0.0.1.
 
-Druhou možností je spouštět skript reload-service.sh s parametrem -u, pomocí něhož definujeme alternativní adresu (např. https://whoami-dev.cesnet.cz) a tím pádem tedy Jetty na HTTP portu poslouchat nemusí. Pro zjednodušení je možné udělat tzv. alias v interpretu příkazů, abyste se vyhnuli zadávání -u <URL>.
+Druhou možností je spouštět skript reload-service.sh s parametrem -u, pomocí něhož definujeme alternativní adresu (např. https://idp.foo.cas.cz) a tím pádem tedy Jetty na HTTP portu poslouchat nemusí. Pro zjednodušení je možné udělat tzv. alias v interpretu příkazů, abyste se vyhnuli zadávání -u <URL>.
 
 Zprovoznění Jetty na HTTP je však triviální záležitostí pomocí několika následujících příkazů a konfiguračních úprav.
 
