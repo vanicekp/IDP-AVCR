@@ -98,6 +98,29 @@ Editujeme:
         p:allowedRanges="#{ {'127.0.0.1/32', '::1/128', '147.231.12.0/22'} }" />
 </entry>
 ```
+## Konfigurace Jetty virtuálu
+Připravíme si konfigurační soubor idp.xml, pomocí něhož definujeme, který WAR (Web application ARchive) bude obsahovat webovou aplikaci našeho IdP a na jaké adrese (v tomto případě https://HOSTNAME_SERVERU/idp) bude přes web IdP naslouchat.
+
+# příkaz zadaný do terminálu:
+``` 
+vi /opt/jetty/webapps/idp.foo.cas.cz.xml
+```
+Obsah konfiguračního souboru /opt/jetty/webapps/idp.foo.cas.cz.xml je následující.
+```
+<Configure class="org.eclipse.jetty.webapp.WebAppContext">
+    <Set name="war">/opt/idp/idp.foo.cas.cz/war/idp.war</Set>
+    <Set name="contextPath">/idp</Set>
+    <Set name="virtualHosts">
+     <Array type="java.lang.String">
+      <Item>idp.test.cas.cz</Item>
+     </Array>
+    </Set>
+    <Set name="extractWAR">false</Set>
+    <Set name="copyWebDir">false</Set>
+    <Set name="copyWebInf">true</Set>
+    <Set name="tempDirectory">/opt/jetty/tmp/idp.foo.cas.cz</Set>
+</Configure>
+```
 
 Restartujeme Jetty, čímž dosáhneme nahrání servletu s Shibboleth IdP:
 
