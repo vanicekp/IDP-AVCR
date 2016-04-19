@@ -93,60 +93,67 @@ Instalace Jetty je velice jednoduchá, stačí stáhnout zdrojové kódy Jetty d
 http://download.eclipse.org/jetty/9.3.8.v20160314dist/
 ```
 
-# příkazy zadané do terminálu:
-
+### příkazy zadané do terminálu:
+```
 cd /opt
 mkdir -p jetty/tmp
-tar -xzvf src/jetty-distribution-9.3.8.v20160314t.tar.gz
-ln -snf /opt/jetty-distribution-9.3.8.v20160314b/in/jetty.sh /etc/init.d/jetty
-echo "JETTY_HOME=/opt/jetty-distribution-99.3.8.v20160314>> /etc/default/jetty
+tar -xzvf src/jetty-distribution-9.3.8.v20160314.tar.gz
+ln -snf /opt/jetty-distribution-9.3.8.v20160314/bin/jetty.sh /etc/init.d/jetty
+echo "JETTY_HOME=/opt/jetty-distribution-99.3.8.v20160314 >> /etc/default/jetty
 echo "JETTY_BASE=/opt/jetty" >> /etc/default/jetty
 ```
 
 Nyní je potřeba Jetty ještě správně nakonfigurovat. Základní konfigurace probíhá spuštěním Jetty s definováním modulů, které budou pro provoz Shibbolethu potřeba:
 
-# příkazy zadané do terminálu:
- 
+### příkazy zadané do terminálu:
+``` 
 cd /opt/jetty
 java -jar /opt/jetty-distribution-9.3.2.v20150730/start.jar \
     --add-to-startd=https,logging,deploy,jsp,jstl,plus,servlets,annotations,ext,resources,logging,requestlog
-
+```
 V souboru start.d/ssl.ini je nutné změnit port, na kterém poběží HTTPS:
 
-# příkaz zadaný do terminálu:
- 
+### příkaz zadaný do terminálu:
+``` 
 vi start.d/ssl.ini
-
+```
 Výchozí nastavení jetty.ssl.port=8443 změníme následovně:
-
+```
 jetty.ssl.port=443
-
+```
 V adresáři /opt/jetty/webapps/root vytvoříme jednoduchou stránku, která se zobrazí při zadání URL adresy naší instalace Jetty. Toto je sice nepoviné, ale pokud se někdo dostane na stránku samotného IdP, je zajisté dobré, aby stránka nevypadala matoucím dojmem. Obsah souboru index.html si upravte dle svého vlastního uvážení – můžete např. nastavit přesměrování na domovskou stránku své organizace.
 
-# příkazy zadané do terminálu:
- 
+### příkazy zadané do terminálu:
+``` 
 mkdir -p /opt/jetty/webapps/root
 vi /opt/jetty/webapps/root/index.html
-
+```
 Připravíme si konfigurační soubor idp.xml, pomocí něhož definujeme, který WAR (Web application ARchive) bude obsahovat webovou aplikaci našeho IdP a na jaké adrese (v tomto případě https://HOSTNAME_SERVERU/idp) bude přes web IdP naslouchat.
 
 # příkaz zadaný do terminálu:
- 
-vi /opt/jetty/webapps/idp.xml
-
-Obsah konfiguračního souboru /opt/jetty/webapps/idp.xml je následující. Konfigurační soubor idp.xml si můžete také stáhnout.
-
+``` 
+vi /opt/jetty/webapps/idp.foo.cas.cz.xml
+```
+Obsah konfiguračního souboru /opt/jetty/webapps/idp.foo.cas.cz.xml je následující.
+```
 <Configure class="org.eclipse.jetty.webapp.WebAppContext">
-    <Set name="war">/opt/shibboleth-idp/war/idp.war</Set>
+    <Set name="war">/opt/idp/idp.foo.cas.cz/war/idp.war</Set>
     <Set name="contextPath">/idp</Set>
+    <Set name="virtualHosts">
+     <Array type="java.lang.String">
+      <Item>idp.test.cas.cz</Item>
+     </Array>
+    </Set>
     <Set name="extractWAR">false</Set>
     <Set name="copyWebDir">false</Set>
     <Set name="copyWebInf">true</Set>
     <Set name="tempDirectory">/opt/jetty/tmp</Set>
 </Configure>
+```
 
 Tímto máme Jetty téměř připraveno. Zatím jej však nebudeme pouštět, jelikož stejně nemáme nainstalovaný Shibboleth IdP a tedy idp.war zatím neexistuje. Navíc jsme ještě nenakonfigurovali SSL certifikát, aby bylo možné k Shibbolethu přistupovat přes HTTPS.
-SSL certifikát
+
+## SSL certifikát
 
 Nyní je ještě potřeba nakonfigurovat použití SSL certifikátu v Jetty, aby bylo možné provozovat Shibboleth IdP přes HTTPS. K tomuto účelu slouží u Javy tzv. „keystore“. Pro korektní zprovoznění HTTPS je potřeba, aby se do klíčenky („keystore“) uložil SSL certifikát včetně kompletního řetězce až ke kořenovému certifikátu certifikační autority (CA).
 
