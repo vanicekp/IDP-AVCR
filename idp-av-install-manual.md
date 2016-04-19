@@ -94,11 +94,11 @@ http://download.eclipse.org/jetty/9.3.8.v20160314dist/
 ```
 
 # příkazy zadané do terminálu:
-``` 
+
 cd /opt
 mkdir -p jetty/tmp
-tar -xzvf src/jetty-distribution-9.3.8.v20160314t..gz
-ln -snf /opt/jetty-distribution-9.3.8.v20160314bin/jetty.sh /etc/init.d/jetty
+tar -xzvf src/jetty-distribution-9.3.8.v20160314t.tar.gz
+ln -snf /opt/jetty-distribution-9.3.8.v20160314b/in/jetty.sh /etc/init.d/jetty
 echo "JETTY_HOME=/opt/jetty-distribution-99.3.8.v20160314>> /etc/default/jetty
 echo "JETTY_BASE=/opt/jetty" >> /etc/default/jetty
 ```
