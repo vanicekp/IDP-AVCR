@@ -88,7 +88,7 @@ Total time: 1 minute 58 seconds
 V souboru /opt/idp/idp.foo.cas.cz/conf/access-control.xml doplníme IP adresy správcovských stanic pro kontrolu 
 statusu serveru.
 ```
-cd /opt/idp/idp.test.cas.cz/
+cd /opt/idp/idp.foo.cas.cz/
 vi conf/access-control.xml
 ```
 Editujeme:
