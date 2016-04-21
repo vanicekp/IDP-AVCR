@@ -102,7 +102,11 @@ ln -snf /opt/jetty-distribution-9.3.8.v20160314/bin/jetty.sh /etc/init.d/jetty
 echo "JETTY_HOME=/opt/jetty-distribution-99.3.8.v20160314 >> /etc/default/jetty
 echo "JETTY_BASE=/opt/jetty" >> /etc/default/jetty
 ```
-Pokud dojde k pořebe zvýši
+Pokud dojde k pořebě zvýšit velikost paměti pro běh jetty což se nedá při větším počtu virtuálů odhadnout, udělá se to
+v /etc/default/jetty.
+```
+JAVA_OPTIONS="-Xmx8192m -Djava.awt.headless=true"
+```
 
 Nyní je potřeba Jetty ještě správně nakonfigurovat. Základní konfigurace probíhá spuštěním Jetty s definováním modulů, které budou pro provoz Shibbolethu potřeba:
 
