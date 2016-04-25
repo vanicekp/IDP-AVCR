@@ -551,7 +551,7 @@ Konfigurační soubor `saml-nameid.properties` je potřeba také upravit.
 ```
 vi conf/saml-nameid.properties
 ```
-Zde definujeme odkazy na výše definované “<bean>y“, dále atribut, který se bude pro výpočet persistentního identifikátoru používat (uid) a sůl použitou pro výpočet (tu jste si již vygenerovali výše).
+Zde definujeme odkazy na výše definované bean-y, dále atribut, který se bude pro výpočet persistentního identifikátoru používat (uid) a sůl použitou pro výpočet (tu jste si již vygenerovali výše).
 ```
 idp.persistentId.generator = shibboleth.StoredPersistentIdGenerator
 idp.persistentId.store = PersistentIdStore
