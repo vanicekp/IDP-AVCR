@@ -199,16 +199,16 @@ Pro autentifikaci je vzhledem ke komplikovnému schematu nutno použít JAAS, zd
     <!-- <import resource="krb5-authn-config.xml" /> -->
     <!-- <import resource="ldap-authn-config.xml" /> -->
 ```
-Dále provedeme konfiguraci  jaas.config  v souboru conf/authn/jaas.config. ID-foo-number je číslo ústavu.
+Dále provedeme konfiguraci JAAS v souboru `conf/authn/jaas.config`. `{ID-foo-number}` je číslo ústavu.
 ```
 ShibUserPassAuth {
    org.ldaptive.jaas.LdapLoginModule required
       ldapUrl="ldap://localhost:50000"
       baseDn="cn=Users,dc=eis,dc=cas,dc=cz"
-      userFilter="(&(cn={user})(employeenumber=ID-foo-number*)(orclisenabled=ENABLED))";
+      userFilter="(&(cn={user})(employeenumber={ID-foo-number}*)(orclisenabled=ENABLED))";
 };
 ```
-V případě komplikovaných ústavů s více čísly je obsah conf/authn/jaas.config následující:
+V případě komplikovaných ústavů s více čísly je obsah `conf/authn/jaas.config` následující:
 ```
 ShibUserPassAuth {
       org.ldaptive.jaas.LdapLoginModule sufficient
@@ -230,26 +230,26 @@ ShibUserPassAuth {
 ```
 
 # attribute-resolver.xml
-V souboru attribute-resolver.xml je definice získávání atributů z LDAPu, mysql, statické konfigurace. Pro nás účel použijeme matrici ze souboru /opt/templates/shibboleth/attribute-resolver.xml.
+V souboru `attribute-resolver.xml` je definice získávání atributů z LDAPu, mysql, statické konfigurace. Pro nás účel použijeme matrici ze souboru `/opt/templates/shibboleth/attribute-resolver.xml`.
 ```
 cp /opt/templates/shibboleth/attribute-resolver.xml conf
 ```
-V souboru je třeba upravit {ID-foo-number}, v případě složitých ústavů se tento řádek zopakuje několikrát. Dále se upraví {NAME} na hodnotu odpovídající ústavu. Další je název scriptu pro nastavení eduPersonEntitlement. Nastavíme hodnotu {Foo}.
+V souboru je třeba upravit `{ID-foo-number}`, v případě složitých ústavů se tento řádek zopakuje několikrát. Dále se upraví `{NAME}` na hodnotu odpovídající ústavu. Další je název scriptu pro nastavení `eduPersonEntitlement`. Nastavíme hodnotu `{Foo}`.
 
 ### Script eduPersonEntitlement
-Vyrobíme kopii /opt/idp/common/script/eduPersonEntitlementFoo.js a upravíme osobní čísla zájmových osob. Kritický řádek pro 3 osoby vypadá :
+Vyrobíme kopii `/opt/idp/common/script/eduPersonEntitlementFoo.js` a upravíme osobní čísla zájmových osob. Kritický řádek pro 3 osoby vypadá :
 ```
 if ((originalValue == "OS1") || (originalValue == "OS3") || (originalValue == "OS3")) {
 ```
 # attribute-filter
-Soubor attribute-filter.xml použijeme z /opt/templates/shibboleth/attribute-filter.xml.
+Soubor `attribute-filter.xml` použijeme z `/opt/templates/shibboleth/attribute-filter.xml`.
 ```
 cp /opt/templates/shibboleth/attribute-filter.xml conf
 ```
 Netřeba žádných změn.
 
 # Logování
-V souboru conf/logback.xml změníme úroveň logování na WARN a DEBUG.
+V souboru `conf/logback.xml` změníme úroveň logování na `WARN` a `DEBUG`.
 ```
     <!-- Logs IdP, but not OpenSAML, messages -->
     <logger name="net.shibboleth.idp" level="WARN"/>
