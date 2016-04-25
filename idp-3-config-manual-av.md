@@ -9,7 +9,7 @@ http://shibboleth.net/downloads/identity-provider/
 cd /opt/src
 tar -xzf src/shibboleth-identity-provider-3.1.2.tar.gz
 ```
-### Příprava instalace
+#### Příprava instalace
 ```
 mkdir /opt/dist
 ```
@@ -17,7 +17,7 @@ mkdir /opt/dist
 cd /opt/dist
 cp -r /opt/src/shibboleth-identity-provider-3.1.2 idp.foo.cas.cz-source
 ```
-### Změna idp.home
+#### Změna idp.home
 V souboru `idp.foo.cas.cz-source/webapp/WEB-INF/web.xml` musíme doplnit definici proměné `idp.home`, jinak bude instalace předpokládat umístění v defaultním adresáři `/opt/shibboleth-idp`.
 ```
 vi idp.foo.cas.cz-source/webapp/WEB-INF/web.xml
@@ -30,7 +30,7 @@ Za parametr `<display-name>` volžíme
 </context-param>
 ```
 
-### Instalce
+#### Instalce
 ```
 cd idp.foo.cas.cz-source/
 ./bin/install.sh
@@ -82,7 +82,7 @@ Rebuilding /opt/idp/idp.foo.cas.cz/war/idp.war ...
 BUILD SUCCESSFUL
 Total time: 1 minute 58 seconds
 ```
-### Povolení Status URL
+#### Povolení Status URL
 
 V souboru `/opt/idp/idp.foo.cas.cz/conf/access-control.xml` doplníme IP adresy správcovských stanic pro kontrolu 
 statusu serveru.
@@ -97,7 +97,7 @@ Editujeme:
         p:allowedRanges="#{ {'127.0.0.1/32', '::1/128', '147.231.12.0/22'} }" />
 </entry>
 ```
-### Perzonifikace loga pro identifikaci virtuálu
+#### Perzonifikace loga pro identifikaci virtuálu
 Do adresáře `/opt/idp/idp.foo.cas.cz/edit-webapp/images` dáme místo prázdného loga logo pro rozlišení virtuálu při chyboových hláškách, v opačném případě nepoznáme který virtuál vygeneroval chybu, není to na stránce napsané.
 ```
 cp  ~/loga/foo.png edit-webapp/images/dummylogo.png
@@ -108,7 +108,7 @@ Installation Directory: [/opt/idp/idp.test.cas.cz]
 ## Konfigurace Jetty virtuálu
 Připravíme si konfigurační soubor idp.xml, pomocí něhož definujeme, který WAR (Web application ARchive) bude obsahovat webovou aplikaci našeho IdP a na jaké adrese (v tomto případě `https://HOSTNAME_SERVERU/idp`) bude přes web IdP naslouchat.
 
-### příkaz zadaný do terminálu:
+#### příkaz zadaný do terminálu:
 ``` 
 vi /opt/jetty/webapps/idp.foo.cas.cz.xml
 ```
@@ -131,7 +131,7 @@ Obsah konfiguračního souboru `/opt/jetty/webapps/idp.foo.cas.cz.xml` je násle
 
 Restartujeme Jetty, čímž dosáhneme nahrání servletu s Shibboleth IdP:
 
-### příkaz zadaný do terminálu:
+#### příkaz zadaný do terminálu:
 ``` 
 /etc/init.d/jetty restart
 ```
@@ -191,7 +191,7 @@ last reload attempt: 2016-04-19T07:06:42Z
 
 Můžete také zkusit ze svého počítače přístoupit na URL adresu s IdP: `https://idp.foo.cas.cz/idp`. Nicméně neuvidíte nic zajímavého. 
 
-# JAAS autentifikace
+## JAAS autentifikace
 Pro autentifikaci je vzhledem ke komplikovnému schematu nutno použít JAAS, zdá se že JETTY má pro každou virtuální instanci zvláštní instanci JAAS takže není tžeba hatakiri z změnou názvu přihlašovací procedury. Konfigurace se provede v `conf/authn/password-authn-config.xml` kde zakomentujeme ladap autentifikaci a povolíme JAAS.
 ```
     <import resource="jaas-authn-config.xml" />
@@ -213,22 +213,22 @@ ShibUserPassAuth {
       org.ldaptive.jaas.LdapLoginModule sufficient
       ldapUrl="ldap://localhost:50000"
       baseDn="cn=Users,dc=eis,dc=cas,dc=cz"
-      userFilter="(&(cn={user})(employeenumber=ID-foo-number1*)(orclisenabled=ENABLED))";
+      userFilter="(&(cn={user})(employeenumber={ID-foo-number1}*)(orclisenabled=ENABLED))";
 
    org.ldaptive.jaas.LdapLoginModule sufficient
       ldapUrl="ldap://localhost:50000"
       baseDn="cn=Users,dc=eis,dc=cas,dc=cz"
-      userFilter="(&(cn={user})(employeenumber=ID-foo-number2*)(orclisenabled=ENABLED))";
+      userFilter="(&(cn={user})(employeenumber={ID-foo-number2}*)(orclisenabled=ENABLED))";
 
    org.ldaptive.jaas.LdapLoginModule sufficient
       ldapUrl="ldap://localhost:50000"
       baseDn="cn=Users,dc=eis,dc=cas,dc=cz"
-      userFilter="(&(cn={user})(employeenumber=ID-foo-number3*)(orclisenabled=ENABLED))";
+      userFilter="(&(cn={user})(employeenumber={ID-foo-number3}*)(orclisenabled=ENABLED))";
 
 };
 ```
 
-# attribute-resolver.xml
+## attribute-resolver.xml
 V souboru `attribute-resolver.xml` je definice získávání atributů z LDAPu, mysql, statické konfigurace. Pro nás účel použijeme matrici ze souboru `/opt/templates/shibboleth/attribute-resolver.xml`.
 ```
 cp /opt/templates/shibboleth/attribute-resolver.xml conf
@@ -240,14 +240,14 @@ Vyrobíme kopii `/opt/idp/common/script/eduPersonEntitlementFoo.js` a upravíme 
 ```
 if ((originalValue == "OS1") || (originalValue == "OS3") || (originalValue == "OS3")) {
 ```
-# attribute-filter
+## attribute-filter
 Soubor `attribute-filter.xml` použijeme z `/opt/templates/shibboleth/attribute-filter.xml`.
 ```
 cp /opt/templates/shibboleth/attribute-filter.xml conf
 ```
 Netřeba žádných změn.
 
-# Logování
+## Logování
 V souboru `conf/logback.xml` změníme úroveň logování na `WARN` a `DEBUG`.
 ```
     <!-- Logs IdP, but not OpenSAML, messages -->
@@ -260,7 +260,7 @@ V souboru `conf/logback.xml` změníme úroveň logování na `WARN` a `DEBUG`.
     <logger name="org.ldaptive" level="DEBUG"/>
 ```
 
-# Konfigurace eduPersonTargetedID 
+## Konfigurace eduPersonTargetedID 
 Konfigurace nutné v souboru `attribute-resolver.xml` již jsou v matrici.
 
 Konfigurační soubor `global.xml` pou6ijeme z matrice.
