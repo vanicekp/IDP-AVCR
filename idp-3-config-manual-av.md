@@ -191,3 +191,40 @@ last reload attempt: 2016-04-19T07:06:42Z
 ```
 
 Můžete také zkusit ze svého počítače přístoupit na URL adresu s IdP: https://idp.foo.cas.cz/idp. Nicméně neuvidíte nic zajímavého. 
+
+# JAAS autentifikace
+Pro autentifikaci je vzhledem ke komplikovnému schematu nutno použít JAAS, zdá se že JETTY má pro každou virtuální instanci zvláštní instanci JAAS takže není tžeba hatakiri z změnou názvu přihlašovací procedury. Konfigurace se provede v conf/authn/password-authn-config.xml kde zakomentujeme ladap autentifikaci a povolíme JAAS.
+```
+    <import resource="jaas-authn-config.xml" />
+    <!-- <import resource="krb5-authn-config.xml" /> -->
+    <!-- <import resource="ldap-authn-config.xml" /> -->
+```
+Dále provedeme konfiguraci  jaas.config  v souboru conf/authn/jaas.config. ID-foo-number je číslo ústavu.
+```
+ShibUserPassAuth {
+   org.ldaptive.jaas.LdapLoginModule required
+      ldapUrl="ldap://localhost:50000"
+      baseDn="cn=Users,dc=eis,dc=cas,dc=cz"
+      userFilter="(&(cn={user})(employeenumber=ID-foo-number*)(orclisenabled=ENABLED))";
+};
+```
+V případě komplikovaných ústavů s více čísly je obsah conf/authn/jaas.config následující:
+```
+ShibUserPassAuth {
+      org.ldaptive.jaas.LdapLoginModule sufficient
+      ldapUrl="ldap://localhost:50000"
+      baseDn="cn=Users,dc=eis,dc=cas,dc=cz"
+      userFilter="(&(cn={user})(employeenumber=ID-foo-number1*)(orclisenabled=ENABLED))";
+
+   org.ldaptive.jaas.LdapLoginModule sufficient
+      ldapUrl="ldap://localhost:50000"
+      baseDn="cn=Users,dc=eis,dc=cas,dc=cz"
+      userFilter="(&(cn={user})(employeenumber=ID-foo-number2*)(orclisenabled=ENABLED))";
+
+   org.ldaptive.jaas.LdapLoginModule sufficient
+      ldapUrl="ldap://localhost:50000"
+      baseDn="cn=Users,dc=eis,dc=cas,dc=cz"
+      userFilter="(&(cn={user})(employeenumber=ID-foo-number3*)(orclisenabled=ENABLED))";
+
+};
+```
