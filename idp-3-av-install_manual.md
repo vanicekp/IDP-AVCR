@@ -162,17 +162,17 @@ Nyní je ještě potřeba nakonfigurovat použití SSL certifikátu v Jetty, aby
 
 Následující návod je pro SSL certifikát získaný pomocí služby TCS CESNET. Soubor cert.pem obsahuje cílový certifikát pro server whoami-dev.cesnet.cz a chain_TERENA_SSL_CA_3.pem obsahuje řetězec certifikátů až k samotnému kořenovému CA. Certifikát pro server nejprve sloučíme s kompletním řetězcem:
 
-### příkaz zadaný do terminálu:
+#### příkaz zadaný do terminálu:
 ``` 
 cat cert.pem chain_TERENA_SSL_CA_3.pem >> jetty-cert.txt
 ```
 Nyní převedeme certifikát s kompletním řetězcem až k CA do formátu PKCS #12. Budeme požádáni o heslo ke klíči (soubor key.pem) a následně budeme požádáni o nové heslo k souboru jetty-cert.pkcs12.
 
-### příkaz zadaný do terminálu:
+#### příkaz zadaný do terminálu:
 ``` 
 openssl pkcs12 -export -inkey key.pem -in jetty-cert.txt -out jetty-cert.pkcs12
 ```
-### výstup příkazu:
+#### výstup příkazu:
 ``` 
 Enter pass phrase for serverkey.pem:
 Enter Export Password:
@@ -180,13 +180,13 @@ Verifying - Enter Export Password:
 ```
 Nyní certifikát včetně kořene ve formátu PKCS #12 (soubor jetty-cert.pkcs12) importujeme do „klíčenky“ Java keystore:
 
-### příkaz zadaný do terminálu:
+#### příkaz zadaný do terminálu:
 ``` 
 /opt/jdk1.8.0_60/bin/keytool -importkeystore -srckeystore jetty-cert.pkcs12 -srcstoretype PKCS12 -destkeystore keystore
 ```
 Nejprve budeme požádáni o heslo k nově vytvářenému „keystore“ (Enter destination keystore password). Pak budeme požádáni o zopakování tohoto hesla (Re-enter new password). Následně budeme požádáni o heslo k certifikátu (soubor jetty-cert.pkcs12), který importujeme do „keystore“ (Enter source keystore password).
 
-### výstup příkazu:
+#### výstup příkazu:
 ``` 
 Enter destination keystore password:  
 Re-enter new password: 
@@ -196,7 +196,7 @@ Import command completed:  1 entries successfully imported, 0 entries failed or 
 ```
 Následně je už jen potřeba keystore uložený v souboru keystore přesunout do Jetty:
 
-### příkaz zadaný do terminálu:
+#### příkaz zadaný do terminálu:
 ``` 
 mv keystore /opt/jetty/etc
 ```
@@ -204,12 +204,12 @@ Předposledním krokem je vygenerovat si pomocí jetty-util, jež je součástí
 
 Heslo ke keystore:
 
-### příkaz zadaný do terminálu:
+#### příkaz zadaný do terminálu:
 ``` 
 java -cp /opt/jetty-distribution-9.3.8.v20160314/lib/jetty-util-9.3.8.v20160314.jar \
     org.eclipse.jetty.util.security.Password <heslo_ke_keystore>
 ```
-### výstup příkazu:
+#### výstup příkazu:
 ``` 
 2015-06-16 15:56:58.986:INFO::main: Logging initialized @322ms
 keystore
@@ -218,12 +218,12 @@ MD5:5fba3d2b004d68d3c5ca4e174024fc81
 ```
 Heslo k certifikátu (heslo, které jste použili při generování klíče k certifikátu):
 
-### příkaz zadaný do terminálu:
+#### příkaz zadaný do terminálu:
 ``` 
 java -cp /opt/jetty-distribution-9.3.8.v20160314/lib/jetty-util-9.3.8.v20160314.jar \
     org.eclipse.jetty.util.security.Password <heslo_k_certifikátu>
 ```
-### výstup příkazu:
+#### výstup příkazu:
 ``` 
 2015-06-16 15:57:02.322:INFO::main: Logging initialized @308ms
 certificate
@@ -232,11 +232,11 @@ MD5:e0d30cef5c6139275b58b525001b413c
 ```
 Heslo (případně hesla) je potřeba zadat do souboru start.d/ssl.ini (jetty.keystore.password bude stejné jako jetty.truststore.password):
 
-### příkaz zadaný do terminálu:
+#### příkaz zadaný do terminálu:
 ``` 
 vi /opt/jetty/start.d/ssl.ini
 ```
-### konfigurační změny v souboru 'ssl.ini'
+#### konfigurační změny v souboru 'ssl.ini'
 ``` 
 jetty.sslContext.keyStorePassword=OBF:1u9x1vn61z0p1yta1ytc1z051vnw1u9l
 jetty.sslContext.keyManagerPassword=OBF:1sot1w1c1uvk1vo01unz1thb1unz1vn21uum1w261sox
@@ -247,7 +247,7 @@ SSL konfigurace
 
 Výchozí konfigurace Jetty umožňuje použití i dnes již nepříliš důvěryhodných šifer. Proto jejich použití v konfiguraci zakážeme.
 
-### příkazy zadané do terminálu:
+#### příkazy zadané do terminálu:
 ``` 
 cd /opt/jetty
 cp ../jetty-distribution-9.3.8.v20160314/etc/jetty-ssl-context.xml etc/
@@ -288,14 +288,14 @@ Druhou možností je spouštět skript reload-service.sh s parametrem -u, pomoc�
 
 Zprovoznění Jetty na HTTP je však triviální záležitostí pomocí několika následujících příkazů a konfiguračních úprav.
 
-### příkazy zadané do terminálu:
+#### příkazy zadané do terminálu:
 ``` 
 cd /opt/jetty
 java -jar /opt/jetty-distribution-9.3.8.v20160314/start.jar --add-to-startd=http
 ```
 V souboru start.d/http.ini provedeme dvě konfigurační změny.
 
-### příkaz zadaný do terminálu:
+#### příkaz zadaný do terminálu:
 ``` 
 vi start.d/http.ini
 ```
@@ -306,14 +306,14 @@ jetty.http.port=80
 ```
 Toto je velice důležité. Prosím, zkontrolujte, zda vám po restartu běží Jetty nešifrovaně (port 80) pouze na „localhostu“ (IP adresa 127.0.0.1) např. pomocí utility nestat:
 
-### příkazy zadané do terminálu:
+#### příkazy zadané do terminálu:
 ``` 
 /etc/init.d/jetty start
 netstat -an | grep ":80"
 ```
 Měl by se Vám zobrazit následující výstup.
 
-### výstup příkazu:
+#### výstup příkazu:
 ```
 tcp6       0      0 127.0.0.1:80            :::*                    LISTEN     
 ```
@@ -330,13 +330,13 @@ java.io.FileNotFoundException: /opt/shibboleth-idp/war/idp.war
 ```
 Jetty je však možné předchozím příkazem nastartovat a ověřit, že v pořádku funguje. Vyzkoušejte přístup přes HTTPS ze svého počítače a případně i přístup přes HTTP z terminálu serveru:
 
-### příkaz zadaný do terminálu:
+#### příkaz zadaný do terminálu:
 ``` 
 wget -q -O - http://127.0.0.1
 ```
 Měli byste vidět obsah souboru `/opt/jetty/webapps/root/index.html`. 
 
-# Hack pro Oracle LDAP
+## Hack pro Oracle LDAP
 Protože nějak blbne LDAP od Oracle a Java 8 si s ním odmítá povídat, bylo nutné to vyřešit hackem přez stunnel.
 Konfigurační soubor /etc/stunnel/stunnel.conf.
 ```
@@ -351,7 +351,7 @@ connect = oid1.eis.cas.cz:3132
 Je nutno  použít verzi stunnelu minimálně 5. Ta z distribuce centos 6 nefunguje.
 Startování stunnelu je v `/etc/rc.local`.
 
-# JAAS
+## JAAS
 Pro autentifikaci je vzhledem ke komplikovnému schematu nutno použít JAAS, zdá se že JETTY má pro každou virtuální instanci zvláštní instanci JAAS takže není třeba harakiri z změnou názvu přihlašovací procedury. Konfigurace se provede v `conf/authn/password-authn-config.xml` kde zakomentujeme ladap autentifikaci a povolíme JAAS.
 ```
     <import resource="jaas-authn-config.xml" />
@@ -368,7 +368,7 @@ ShibUserPassAuth {
 };
 ```
 
-# LDAP connector
+## LDAP connector
 Konfigurace LDAP connectoru v conf/ldap.properties opět nefunguje, nejspíše "protože Oracle LDAP", vyřešeno použítím výše zmíněného stunnelu. V `conf/attribute-resolver.xml` nadefinujeme novy DataConnector pro LDAP v jednoduché konfiguraci, ten původní používající `ldap.properties` zakomentujeme.
 
 ```
@@ -388,7 +388,7 @@ Konfigurace LDAP connectoru v conf/ldap.properties opět nefunguje, nejspíše "
     </resolver:DataConnector>
 ```
 
-# attribute-resolver
+## attribute-resolver
 V souboru `attribute-resolver.xml` definujeme attributy
 
 ### Skripty pro shibboleth 3
@@ -433,8 +433,8 @@ if (typeof uniqueIdentifier != "undefined" && uniqueIdentifier != null && unique
 }
 eduPersonEntitlement.getValues().add("urn:mace:dir:entitlement:common-lib-terms");
 ```
-# Persistentní identifikátor / eduPersonTargetedID
-## MySQL
+## Persistentní identifikátor / eduPersonTargetedID
+### MySQL
 Nainstalujem mysql-server a uděláme základní konfiguraci
 ```
  yum install mysql-server
@@ -445,7 +445,7 @@ Nastavíme hesla k mysql aby to trochu chodilo, odpovědi na otázky scriptu dej
 ```
 mysql_secure_installation
 ```
-# Migrace stávajících identifikátorů
+#### Migrace stávajících identifikátorů
 na původním IDP stahneme databázi identifikátorů
 ```
 mysqldump shibboleth > ~/persistentID.sql
@@ -470,25 +470,25 @@ Importujeme data
 mysql -u root -p shibboleth < ~/persistentID.sql
 ```
 
-## Jetty
+### Jetty
 Jetty potřebuje pro správnou funkčnost tyto tři JAR soubory, které je nutné umístit do složky s externími knihovnami `/opt/jetty/lib/ext`: 
 
 commons-dbcp-1.4.jar http://search.maven.org/remotecontent?filepath=commons-dbcp/commons-dbcp/1.4/commons-dbcp-1.4.jar
 commons-pool-1.6.jar http://search.maven.org/remotecontent?filepath=commons-pool/commons-pool/1.6/commons-pool-1.6.jar
 mysql-connector-java-5.1.36-bin.jar http://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.36.tar.gz
 
-### Apache Commons DBCP & Pool
+#### Apache Commons DBCP & Pool
 ```
 cd /opt/src/
 cp commons-dbcp-1.4.jar commons-pool-1.6.jar /opt/jetty/lib/ext/
 ```
-### MySQL Connector/J
+#### MySQL Connector/J
 ```
 cd /opt/src/
 tar -xzf mysql-connector-java-5.1.36.tar.gz
 cp mysql-connector-java-5.1.36/mysql-connector-java-5.1.36-bin.jar /opt/jetty/lib/ext/
 ```
-## Shibboleth IdP
+### Shibboleth IdP
 Do konfiguračního souboru attribute-resolver.xml musíme doplnit podporu pro persistentní identifikátor.
 ```
 vi conf/attribute-resolver.xml
@@ -515,7 +515,7 @@ A poté je potřeba nadefinovat konektor. Salt jsem vzal ze staré instalace.
     <dc:BeanManagedConnection>shibboleth.MySQLDataSource</dc:BeanManagedConnection>
 </resolver:DataConnector>
 ```
-Nyní je potřeba v souboru `conf/global.xml` definovat “<bean>y“. 
+Nyní je potřeba v souboru `conf/global.xml` definovat bean-y“. 
 ```
 vi conf/global.xml
 ```
