@@ -582,7 +582,7 @@ Přidejte tedy do elementu `<IDPSSODescriptor>` následující řádek ke zbýva
 ```
 <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>
 ```
-Poslední nutný konfigurační krok spočívá v přidání knihovny JSTL do Shibbolethu. Zkopírujte tedy `jstl-1.2.jar` (`http://search.maven.org/remotecontent?filepath=jstl/jstl/1.2/jstl-1.2.jar`) do adresáře /opt/shibboleth-idp/edit-webapp/WEB-INF/lib. A následně přegenerujte JAR Shibbolethu a restartujte Jetty:
+Poslední nutný konfigurační krok spočívá v přidání knihovny JSTL do Shibbolethu. Zkopírujte tedy `jstl-1.2.jar` (`http://search.maven.org/remotecontent?filepath=jstl/jstl/1.2/jstl-1.2.jar`) do adresáře `edit-webapp/WEB-INF/lib`. A následně přegenerujte JAR Shibbolethu a restartujte Jetty:
 ```
 cd /opt/shibboleth-idp
 ./bin/build.sh
