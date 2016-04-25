@@ -521,5 +521,70 @@ A poté je potřeba nadefinovat konektor. Salt jsem vzal ze staré instalace.
     <dc:BeanManagedConnection>shibboleth.MySQLDataSource</dc:BeanManagedConnection>
 </resolver:DataConnector>
 ```
-Nyní je potřeba v souboru global.xml definovat “<bean>y“. 
-
+Nyní je potřeba v souboru `conf/global.xml` definovat “<bean>y“. 
+```
+vi conf/global.xml
+```
+Následující konfigurace zajistí správnou konektivitu na MySQL databázi pro ukládání persistentních identifikátorů.
+```
+<bean id="shibboleth.MySQLDataSource"
+    class="org.apache.commons.dbcp.BasicDataSource"
+    p:driverClassName="com.mysql.jdbc.Driver"
+    p:url="jdbc:mysql://localhost:3306/shibboleth"
+    p:username="shibboleth"
+    p:password="silne_heslo" />
+ 
+<bean id="PersistentIdStore"
+    class="net.shibboleth.idp.saml.nameid.impl.JDBCPersistentIdStore"
+    p:dataSource-ref="shibboleth.MySQLDataSource" />
+```
+ V konfiguračním souboru attribute-filter.xml nastavíme vydávání atributu eduPersonTargetedID. 
+``` 
+vi /opt/shibboleth-idp/conf/attribute-filter.xml
+```
+```
+<afp:AttributeRule attributeID="eduPersonTargetedID">
+  <afp:PermitValueRule xsi:type="basic:ANY" />
+</afp:AttributeRule>
+```
+Konfigurační soubor `saml-nameid.properties` je potřeba také upravit.
+```
+vi conf/saml-nameid.properties
+```
+Zde definujeme odkazy na výše definované “<bean>y“, dále atribut, který se bude pro výpočet persistentního identifikátoru používat (uid) a sůl použitou pro výpočet (tu jste si již vygenerovali výše).
+```
+idp.persistentId.generator = shibboleth.StoredPersistentIdGenerator
+idp.persistentId.store = PersistentIdStore
+idp.persistentId.sourceAttribute = eduPersonPrincipalName
+idp.persistentId.salt = SALT
+```
+Podpora persistentních identifikátorů je ještě potřeba zapnout v konfiguračním souboru saml-nameid.xml.
+```
+vi conf/saml-nameid.xml
+```
+Stačí odkomentovat následující řádek, který je ve výchozí konfiguraci po instalaci IdP zakomentovaný.
+```
+<ref bean="shibboleth.SAML2PersistentGenerator" />
+```
+Ještě zbývá úprava v souboru `subject-c14n.xml`.
+```
+vi conf/c14n/subject-c14n.xml
+```
+Odkomentujte následující řádek:
+```
+<ref bean="c14n/SAML2Persistent" />
+```
+V metadatech IdP je potřeba zadat, že IdP podporuje persistentní identifikátor.
+```
+vi /opt/shibboleth-idp/metadata/idp-metadata.xml
+```
+Přidejte tedy do elementu `<IDPSSODescriptor>` následující řádek ke zbývajícím dvoum elementům `<NameIDFormat>`.
+```
+<NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>
+```
+Poslední nutný konfigurační krok spočívá v přidání knihovny JSTL do Shibbolethu. Zkopírujte tedy `jstl-1.2.jar` (`http://search.maven.org/remotecontent?filepath=jstl/jstl/1.2/jstl-1.2.jar`) do adresáře /opt/shibboleth-idp/edit-webapp/WEB-INF/lib. A následně přegenerujte JAR Shibbolethu a restartujte Jetty:
+```
+cd /opt/shibboleth-idp
+./bin/build.sh
+/etc/init.d/jetty restart
+```
