@@ -228,3 +228,38 @@ ShibUserPassAuth {
 
 };
 ```
+
+# attribute-resolver.xml
+V souboru attribute-resolver.xml je definice získávání atributů z LDAPu, mysql, statické konfigurace. Pro nás účel použijeme matrici ze souboru /opt/templates/shibboleth/attribute-resolver.xml.
+```
+cp /opt/templates/shibboleth/attribute-resolver.xml conf
+```
+V souboru je třeba upravit {ID-foo-number}, v případě složitých ústavů se tento řádek zopakuje několikrát. Dále se upraví {NAME} na hodnotu odpovídající ústavu. Další je název scriptu pro nastavení eduPersonEntitlement. Nastavíme hodnotu {Foo}.
+
+### Script eduPersonEntitlement
+Vyrobíme kopii /opt/idp/common/script/eduPersonEntitlementFoo.js a upravíme osobní čísla zájmových osob. Kritický řádek pro 3 osoby vypadá :
+```
+if ((originalValue == "OS1") || (originalValue == "OS3") || (originalValue == "OS3")) {
+```
+# attribute-filter
+Soubor attribute-filter.xml použijeme z /opt/templates/shibboleth/attribute-filter.xml.
+```
+cp /opt/templates/shibboleth/attribute-filter.xml conf
+```
+Netřeba žádných změn.
+
+# Logování
+V souboru conf/logback.xml změníme úroveň logování na WARN a DEBUG.
+```
+    <!-- Logs IdP, but not OpenSAML, messages -->
+    <logger name="net.shibboleth.idp" level="WARN"/>
+
+    <!-- Logs OpenSAML, but not IdP, messages -->
+    <logger name="org.opensaml.saml" level="WARN"/>
+
+    <!-- Logs LDAP related messages -->
+    <logger name="org.ldaptive" level="DEBUG"/>
+```
+
+
+
