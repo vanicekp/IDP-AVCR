@@ -260,5 +260,35 @@ V souboru `conf/logback.xml` změníme úroveň logování na `WARN` a `DEBUG`.
     <logger name="org.ldaptive" level="DEBUG"/>
 ```
 
+# Konfigurace eduPersonTargetedID 
+Konfigurace nutné v souboru `attribute-resolver.xml` již jsou v matrici.
 
-
+Konfigurační soubor `saml-nameid.properties` použijeme z matrice.
+```
+cp /opt/templates/shibboleth/saml-nameid.properties conf/
+```
+Konfigurační soubor `saml-nameid.xml` použijeme z matrice.
+```
+cp /opt/templates/shibboleth/saml-nameid.xml conf/
+```
+Soubor `subject-c14n.xml` pou6ijeme z matrice.
+```
+cp /opt/templates/shibboleth/subject-c14n.xml conf/c14n
+```
+V metadatech IdP je potřeba zadat, že IdP podporuje persistentní identifikátor.
+```
+vi metadata/idp-metadata.xml
+```
+Přidejte tedy do elementu `<IDPSSODescriptor>` následující řádek ke zbývajícím dvoum elementům `<NameIDFormat>`.
+```
+<NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>
+```
+Přidáme knihovnu JSTL do shibbolethu.
+```
+cp /opt/src/jstl-1.2.jar edit-webapp/WEB-INF/lib
+```
+Přegenerujte JAR Shibbolethu a restartujeme jetty
+```
+./bin/build.sh
+/etc/init.d/jetty restart
+```
