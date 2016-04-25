@@ -341,3 +341,101 @@ Jetty je však možné předchozím příkazem nastartovat a ověřit, že v po�
 wget -q -O - http://127.0.0.1
 ```
 Měli byste vidět obsah souboru /opt/jetty/webapps/root/index.html. 
+
+# Hack pro Oracle LDAP
+Protože nějak blbne LDAP od Oracle a Java 8 si s ním odmítá povídat, bylo nutné to vyřešit hackem přez stunnel.
+Konfigurační soubor /etc/stunnel/stunnel.conf.
+```
+socket = l:TCP_NODELAY=1
+socket = r:TCP_NODELAY=1
+sslVersion = SSLv3
+client=yes
+[ldap]
+accept  = 127.0.0.1:50000
+connect = oid1.eis.cas.cz:3132
+```
+Je nutno  použít verzi stunnelu minimálně 5. Ta z distribuce centos 6 nefunguje.
+Startování stunnelu je v /etc/rc.local.
+
+# JAAS
+Pro autentifikaci je vzhledem ke komplikovnému schematu nutno použít JAAS, zdá se že JETTY má pro každou virtuální instanci zvláštní instanci JAAS takže není tžeba hatakiri z změnou názvu přihlašovací procedury. Konfigurace se provede v conf/authn/password-authn-config.xml kde zakomentujeme ladap autentifikaci a povolíme JAAS.
+```
+    <import resource="jaas-authn-config.xml" />
+    <!-- <import resource="krb5-authn-config.xml" /> -->
+    <!-- <import resource="ldap-authn-config.xml" /> -->
+```
+Dále provedeme konfiguraci  jaas.config  v souboru conf/authn/jaas.config. ID-foo-number je číslo ústavu.
+```
+ShibUserPassAuth {
+   org.ldaptive.jaas.LdapLoginModule required
+      ldapUrl="ldap://localhost:50000"
+      baseDn="cn=Users,dc=eis,dc=cas,dc=cz"
+      userFilter="(&(cn={user})(employeenumber=ID-foo-number*)(orclisenabled=ENABLED))";
+};
+```
+
+# LDAP connector
+Konfigurace LDAP connectoru v conf/ldap.properties opět nefunguje, nejspíše "protože Oracle LDAP", vyřešeno použítím výše zmíněného stunnelu. V conf/attribute-resolver.xml nadefinujeme novy DataConnector pro LDAP v jednoduché konfiguraci, ten původní používající ldap.properties zakomentujeme.
+
+```
+    <!--
+        LDAP Connector
+        https://wiki.shibboleth.net/confluence/display/SHIB2/ResolverLDAPDataConnector
+    -->
+    <resolver:DataConnector id="myLDAP" xsi:type="dc:LDAPDirectory"
+        ldapURL="ldap://localhost:50000"
+        baseDN="cn=Users,dc=eis,dc=cas,dc=cz"
+        >
+        <dc:FilterTemplate>
+            <![CDATA[
+                (cn=$requestContext.principalName)
+            ]]>
+        </dc:FilterTemplate>
+    </resolver:DataConnector>
+```
+
+# attribute-resolver
+V souboru attribute-resolver.xml definujeme attributy
+
+### Skripty pro shibboleth 3
+Protože Java 8 změnila engine pro vnořené javascripty a zároveň shibbolet 3 změnil částčně API pro psaní javascriptů bylo nutné upravit scripty pro odháčkování a  eduPersonEntitlement.
+
+Script /opt/idp/common/script/commonNameASCII.js
+```
+load("nashorn:mozilla_compat.js")
+logger = Java.type("org.slf4j.LoggerFactory").getLogger("net.shibboleth.idp.attribute.resolver.eppnbuilder");
+scopedValueType =  Java.type("net.shibboleth.idp.attribute.ScopedStringAttributeValue");
+var localpart = "";
+
+importPackage(Packages.java.lang);
+importPackage(Packages.java.text);
+
+
+if (!commonName.getValues().isEmpty()) {
+    originalValue = commonName.getValues().get(0);
+    asciiValue = Normalizer.normalize(originalValue, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+
+    commonNameASCII.getValues().add(asciiValue);
+}
+```
+
+Script  /opt/idp/common/script/eduPersonEntitlementFoo.js
+```
+load("nashorn:mozilla_compat.js")
+logger = Java.type("org.slf4j.LoggerFactory").getLogger("net.shibboleth.idp.attribute.resolver.eppnbuilder");
+scopedValueType =  Java.type("net.shibboleth.idp.attribute.ScopedStringAttributeValue");
+var localpart = "";
+
+importPackage(Packages.org.slf4j);
+
+if (typeof uniqueIdentifier != "undefined" && uniqueIdentifier != null && uniqueIdentifier.getValues().contains("EduID")) {
+                originalValue = unstructuredName.getValues().get(0);
+                        if (originalValue == "{OID1}") {
+                                eduPersonEntitlement.getValues().add("urn:mace:terena.org:tcs:escience-admin");
+                                eduPersonEntitlement.getValues().add("urn:mace:terena.org:tcs:personal-admin");
+                        }
+          eduPersonEntitlement.getValues().add("urn:mace:terena.org:tcs:personal-user");
+          eduPersonEntitlement.getValues().add("urn:mace:terena.org:tcs:escience-user");
+}
+eduPersonEntitlement.getValues().add("urn:mace:dir:entitlement:common-lib-terms");
+```
