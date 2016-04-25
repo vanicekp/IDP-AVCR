@@ -494,4 +494,32 @@ cd /opt/src/
 tar -xzf mysql-connector-java-5.1.36.tar.gz
 cp mysql-connector-java-5.1.36/mysql-connector-java-5.1.36-bin.jar /opt/jetty/lib/ext/
 ```
+## Shibboleth IdP
+Do konfiguračního souboru attribute-resolver.xml musíme doplnit podporu pro persistentní identifikátor.
+```
+vi conf/attribute-resolver.xml
+```
+Nejprve je potřeba zadat definici atributu:
+```
+<!-- eduPersonTargetedID -->
+<resolver:AttributeDefinition id="eduPersonTargetedID" xsi:type="ad:SAML2NameID" sourceAttributeID="persistentID" nameIdFormat="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent">
+    <resolver:Dependency ref="myStoredId" />
+    <resolver:AttributeEncoder xsi:type="enc:SAML1XMLObject" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.10" />
+    <resolver:AttributeEncoder xsi:type="enc:SAML2XMLObject" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.10" friendlyName="eduPersonTargetedID" />
+</resolver:AttributeDefinition>
+```
+A poté je potřeba nadefinovat konektor. Salt jsem vzal ze staré instalace.
+```
+<!-- StoredId Data Connector -->
+<resolver:DataConnector id="myStoredId"
+    xsi:type="dc:StoredId"
+    sourceAttributeID="eduPersonPrincipalName"
+    generatedAttributeID="persistentID"
+    salt="SALT"
+    queryTimeout="0">
+    <resolver:Dependency ref="eduPersonPrincipalName" />
+    <dc:BeanManagedConnection>shibboleth.MySQLDataSource</dc:BeanManagedConnection>
+</resolver:DataConnector>
+```
+Nyní je potřeba v souboru global.xml definovat “<bean>y“. 
 
