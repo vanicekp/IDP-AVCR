@@ -4,7 +4,7 @@ Stáhnout Shibboleth IdP a umístit do adresáře `/opt/src`.
 ```
 http://shibboleth.net/downloads/identity-provider/
 ```
-### příkazy zadané do terminálu:
+#### příkazy zadané do terminálu:
 ``` 
 cd /opt/src
 tar -xzf src/shibboleth-identity-provider-3.1.2.tar.gz
