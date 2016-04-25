@@ -6,7 +6,7 @@ hibboleth konzorcium. Použijeme tedy Javu od Oracle. Čas od času se objeví n
 oblém způsobený použitím např. OpenJDK. Budeme-li žádat o podporu, může se stát, že b
 udeme vyzváni, abychom problém reprodukovali s využitím Javy od společnosti Oracle.
 
-Po stažení Oracle JDK umístíme archiv do adresáře /opt/src a pomocí následujících příkazů J
+Po stažení Oracle JDK umístíme archiv do adresáře `/opt/src` a pomocí následujících příkazů J
 DK nainstalujeme:
 ```
 http://www.oracle.com/technetwork/java/javase/downloads/index.html
@@ -87,7 +87,7 @@ rm -rf UnlimitedJCEPolicyJDK8/
 
 # Jetty
 
-Instalace Jetty je velice jednoduchá, stačí stáhnout zdrojové kódy Jetty do adřesáře /opt/src a spustit několik následujících příkazů:
+Instalace Jetty je velice jednoduchá, stačí stáhnout zdrojové kódy Jetty do adresáře `/opt/src` a spustit několik následujících příkazů:
 
 ```
 http://download.eclipse.org/jetty/9.3.8.v20160314dist/
@@ -103,7 +103,7 @@ echo "JETTY_HOME=/opt/jetty-distribution-99.3.8.v20160314 >> /etc/default/jetty
 echo "JETTY_BASE=/opt/jetty" >> /etc/default/jetty
 ```
 Pokud dojde k pořebě zvýšit velikost paměti pro běh jetty což se nedá při větším počtu virtuálů odhadnout, udělá se to
-v /etc/default/jetty.
+v `/etc/default/jetty`.
 ```
 JAVA_OPTIONS="-Xmx8192m -Djava.awt.headless=true"
 ```
@@ -116,7 +116,7 @@ cd /opt/jetty
 java -jar /opt/jetty-distribution-9.3.2.v20150730/start.jar \
     --add-to-startd=https,logging,deploy,jsp,jstl,plus,servlets,annotations,ext,resources,logging,requestlog
 ```
-V souboru start.d/ssl.ini je nutné změnit port, na kterém poběží HTTPS:
+V souboru `start.d/ssl.ini` je nutné změnit port, na kterém poběží HTTPS:
 
 ### příkaz zadaný do terminálu:
 ``` 
@@ -126,14 +126,14 @@ Výchozí nastavení jetty.ssl.port=8443 změníme následovně:
 ```
 jetty.ssl.port=443
 ```
-V adresáři /opt/jetty/webapps/root vytvoříme jednoduchou stránku, která se zobrazí při zadání URL adresy naší instalace Jetty. Toto je sice nepoviné, ale pokud se někdo dostane na stránku samotného IdP, je zajisté dobré, aby stránka nevypadala matoucím dojmem. Obsah souboru index.html si upravte dle svého vlastního uvážení – můžete např. nastavit přesměrování na domovskou stránku své organizace.
+V adresáři `/opt/jetty/webapps/root` vytvoříme jednoduchou stránku, která se zobrazí při zadání URL adresy naší instalace Jetty. Toto je sice nepoviné, ale pokud se někdo dostane na stránku samotného IdP, je zajisté dobré, aby stránka nevypadala matoucím dojmem. Obsah souboru index.html si upravte dle svého vlastního uvážení – můžete např. nastavit přesměrování na domovskou stránku své organizace.
 
 ### příkazy zadané do terminálu:
 ``` 
 mkdir -p /opt/jetty/webapps/root
 vi /opt/jetty/webapps/root/index.html
 ```
-Připravíme si konfigurační soubor idp.xml, pomocí něhož definujeme, který WAR (Web application ARchive) bude obsahovat webovou aplikaci našeho IdP a na jaké adrese (v tomto případě https://HOSTNAME_SERVERU/idp) bude přes web IdP naslouchat.
+Připravíme si konfigurační soubor idp.xml, pomocí něhož definujeme, který WAR (Web application ARchive) bude obsahovat webovou aplikaci našeho IdP a na jaké adrese (v tomto případě `https://HOSTNAME_SERVERU/idp`) bude přes web IdP naslouchat.
 
 # příkaz zadaný do terminálu:
 ``` 
@@ -155,7 +155,7 @@ Obsah konfiguračního souboru /opt/jetty/webapps/idp.foo.cas.cz.xml je následu
     <Set name="tempDirectory">/opt/jetty/tmp/idp.foo.cas.cz</Set>
 </Configure>
 ```
-### Musíme založit adresář /opt/jetty/tmp
+### Musíme založit adresář `/opt/jetty/tmp`
 ```
 mkdir /opt/jetty/tmp
 ```
@@ -248,7 +248,7 @@ jetty.sslContext.keyStorePassword=OBF:1u9x1vn61z0p1yta1ytc1z051vnw1u9l
 jetty.sslContext.keyManagerPassword=OBF:1sot1w1c1uvk1vo01unz1thb1unz1vn21uum1w261sox
 jetty.sslContext.trustStorePassword=OBF:1u9x1vn61z0p1yta1ytc1z051vnw1u9l
 ```
-Proměnné jetty.sslContext.keyStorePassword a jetty.sslContext.trustStorePassword nastavte na obfuskované heslo ke „keystore“. Proměnnou jetty.sslContext.keyManagerPassword nastavte na obfuskované heslo ke klíči certifikátu (soubor jetty-cert.pkcs12!). Pokud to popletete, Jetty odmítne nastartovat, jelikož nepřečte keystore a klíč.
+Proměnné `jetty.sslContext.keyStorePassword` a `jetty.sslContext.trustStorePassword` nastavte na obfuskované heslo ke „keystore“. Proměnnou `jetty.sslContext.keyManagerPassword` nastavte na obfuskované heslo ke klíči certifikátu (soubor jetty-cert.pkcs12!). Pokud to popletete, Jetty odmítne nastartovat, jelikož nepřečte keystore a klíč.
 SSL konfigurace
 
 Výchozí konfigurace Jetty umožňuje použití i dnes již nepříliš důvěryhodných šifer. Proto jejich použití v konfiguraci zakážeme.
@@ -340,7 +340,7 @@ Jetty je však možné předchozím příkazem nastartovat a ověřit, že v po�
 ``` 
 wget -q -O - http://127.0.0.1
 ```
-Měli byste vidět obsah souboru /opt/jetty/webapps/root/index.html. 
+Měli byste vidět obsah souboru `/opt/jetty/webapps/root/index.html`. 
 
 # Hack pro Oracle LDAP
 Protože nějak blbne LDAP od Oracle a Java 8 si s ním odmítá povídat, bylo nutné to vyřešit hackem přez stunnel.
@@ -355,27 +355,27 @@ accept  = 127.0.0.1:50000
 connect = oid1.eis.cas.cz:3132
 ```
 Je nutno  použít verzi stunnelu minimálně 5. Ta z distribuce centos 6 nefunguje.
-Startování stunnelu je v /etc/rc.local.
+Startování stunnelu je v `/etc/rc.local`.
 
 # JAAS
-Pro autentifikaci je vzhledem ke komplikovnému schematu nutno použít JAAS, zdá se že JETTY má pro každou virtuální instanci zvláštní instanci JAAS takže není tžeba hatakiri z změnou názvu přihlašovací procedury. Konfigurace se provede v conf/authn/password-authn-config.xml kde zakomentujeme ladap autentifikaci a povolíme JAAS.
+Pro autentifikaci je vzhledem ke komplikovnému schematu nutno použít JAAS, zdá se že JETTY má pro každou virtuální instanci zvláštní instanci JAAS takže není třeba harakiri z změnou názvu přihlašovací procedury. Konfigurace se provede v `conf/authn/password-authn-config.xml` kde zakomentujeme ladap autentifikaci a povolíme JAAS.
 ```
     <import resource="jaas-authn-config.xml" />
     <!-- <import resource="krb5-authn-config.xml" /> -->
     <!-- <import resource="ldap-authn-config.xml" /> -->
 ```
-Dále provedeme konfiguraci  jaas.config  v souboru conf/authn/jaas.config. ID-foo-number je číslo ústavu.
+Dále provedeme konfiguraci JAAS v souboru `conf/authn/jaas.config`. `{ID-foo-number}` je číslo ústavu.
 ```
 ShibUserPassAuth {
    org.ldaptive.jaas.LdapLoginModule required
       ldapUrl="ldap://localhost:50000"
       baseDn="cn=Users,dc=eis,dc=cas,dc=cz"
-      userFilter="(&(cn={user})(employeenumber=ID-foo-number*)(orclisenabled=ENABLED))";
+      userFilter="(&(cn={user})(employeenumber={ID-foo-number}*)(orclisenabled=ENABLED))";
 };
 ```
 
 # LDAP connector
-Konfigurace LDAP connectoru v conf/ldap.properties opět nefunguje, nejspíše "protože Oracle LDAP", vyřešeno použítím výše zmíněného stunnelu. V conf/attribute-resolver.xml nadefinujeme novy DataConnector pro LDAP v jednoduché konfiguraci, ten původní používající ldap.properties zakomentujeme.
+Konfigurace LDAP connectoru v conf/ldap.properties opět nefunguje, nejspíše "protože Oracle LDAP", vyřešeno použítím výše zmíněného stunnelu. V `conf/attribute-resolver.xml` nadefinujeme novy DataConnector pro LDAP v jednoduché konfiguraci, ten původní používající `ldap.properties` zakomentujeme.
 
 ```
     <!--
@@ -395,12 +395,12 @@ Konfigurace LDAP connectoru v conf/ldap.properties opět nefunguje, nejspíše "
 ```
 
 # attribute-resolver
-V souboru attribute-resolver.xml definujeme attributy
+V souboru `attribute-resolver.xml` definujeme attributy
 
 ### Skripty pro shibboleth 3
 Protože Java 8 změnila engine pro vnořené javascripty a zároveň shibbolet 3 změnil částčně API pro psaní javascriptů bylo nutné upravit scripty pro odháčkování a  eduPersonEntitlement.
 
-Script /opt/idp/common/script/commonNameASCII.js
+Script `/opt/idp/common/script/commonNameASCII.js`
 ```
 load("nashorn:mozilla_compat.js")
 logger = Java.type("org.slf4j.LoggerFactory").getLogger("net.shibboleth.idp.attribute.resolver.eppnbuilder");
@@ -419,7 +419,7 @@ if (!commonName.getValues().isEmpty()) {
 }
 ```
 
-Script  /opt/idp/common/script/eduPersonEntitlementFoo.js
+Script  `/opt/idp/common/script/eduPersonEntitlementFoo.js`
 ```
 load("nashorn:mozilla_compat.js")
 logger = Java.type("org.slf4j.LoggerFactory").getLogger("net.shibboleth.idp.attribute.resolver.eppnbuilder");
