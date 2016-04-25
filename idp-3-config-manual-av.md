@@ -1,6 +1,6 @@
 # Instalace IdP
 
-Stáhnout Shibboleth IdP a umístit do adresáře /opt/src.
+Stáhnout Shibboleth IdP a umístit do adresáře `/opt/src`.
 ```
 http://shibboleth.net/downloads/identity-provider/
 ```
@@ -18,12 +18,11 @@ cd /opt/dist
 cp -r /opt/src/shibboleth-identity-provider-3.1.2 idp.foo.cas.cz-source
 ```
 ### Změna idp.home
-V souboru idp.foo.cas.cz-source/webapp/WEB-INF/web.xml musíme doplnit definici proměné idp.home, jinak bude instalace předpokládat umístění v 
-defaultním adresáři /opt/shibboleth-idp.
+V souboru `idp.foo.cas.cz-source/webapp/WEB-INF/web.xml` musíme doplnit definici proměné `idp.home`, jinak bude instalace předpokládat umístění v defaultním adresáři `/opt/shibboleth-idp`.
 ```
 vi idp.foo.cas.cz-source/webapp/WEB-INF/web.xml
 ```
-Za parametr <display-name> volžíme 
+Za parametr `<display-name>` volžíme 
 ```
 <context-param>
     <param-name>idp.home</param-name>
@@ -85,7 +84,7 @@ Total time: 1 minute 58 seconds
 ```
 ### Povolení Status URL
 
-V souboru /opt/idp/idp.foo.cas.cz/conf/access-control.xml doplníme IP adresy správcovských stanic pro kontrolu 
+V souboru `/opt/idp/idp.foo.cas.cz/conf/access-control.xml` doplníme IP adresy správcovských stanic pro kontrolu 
 statusu serveru.
 ```
 cd /opt/idp/idp.foo.cas.cz/
@@ -99,7 +98,7 @@ Editujeme:
 </entry>
 ```
 ### Perzonifikace loga pro identifikaci virtuálu
-Do adresáře /opt/idp/idp.foo.cas.cz/edit-webapp/images dáme místo prázdného loga logo pro rozlišení virtuálu při chyboových hláškách, v opačném případě nepoznáme který virtuál vygeneroval chybu, není to na stránce napsané.
+Do adresáře `/opt/idp/idp.foo.cas.cz/edit-webapp/images` dáme místo prázdného loga logo pro rozlišení virtuálu při chyboových hláškách, v opačném případě nepoznáme který virtuál vygeneroval chybu, není to na stránce napsané.
 ```
 cp  ~/loga/foo.png edit-webapp/images/dummylogo.png
 ./bin/build.sh
@@ -107,13 +106,13 @@ Installation Directory: [/opt/idp/idp.test.cas.cz]
 ```
 
 ## Konfigurace Jetty virtuálu
-Připravíme si konfigurační soubor idp.xml, pomocí něhož definujeme, který WAR (Web application ARchive) bude obsahovat webovou aplikaci našeho IdP a na jaké adrese (v tomto případě https://HOSTNAME_SERVERU/idp) bude přes web IdP naslouchat.
+Připravíme si konfigurační soubor idp.xml, pomocí něhož definujeme, který WAR (Web application ARchive) bude obsahovat webovou aplikaci našeho IdP a na jaké adrese (v tomto případě `https://HOSTNAME_SERVERU/idp`) bude přes web IdP naslouchat.
 
 ### příkaz zadaný do terminálu:
 ``` 
 vi /opt/jetty/webapps/idp.foo.cas.cz.xml
 ```
-Obsah konfiguračního souboru /opt/jetty/webapps/idp.foo.cas.cz.xml je následující.
+Obsah konfiguračního souboru `/opt/jetty/webapps/idp.foo.cas.cz.xml` je následující.
 ```
 <Configure class="org.eclipse.jetty.webapp.WebAppContext">
     <Set name="war">/opt/idp/idp.foo.cas.cz/war/idp.war</Set>
@@ -190,10 +189,10 @@ last successful reload attempt: 2016-04-19T07:06:42Z
 last reload attempt: 2016-04-19T07:06:42Z
 ```
 
-Můžete také zkusit ze svého počítače přístoupit na URL adresu s IdP: https://idp.foo.cas.cz/idp. Nicméně neuvidíte nic zajímavého. 
+Můžete také zkusit ze svého počítače přístoupit na URL adresu s IdP: `https://idp.foo.cas.cz/idp`. Nicméně neuvidíte nic zajímavého. 
 
 # JAAS autentifikace
-Pro autentifikaci je vzhledem ke komplikovnému schematu nutno použít JAAS, zdá se že JETTY má pro každou virtuální instanci zvláštní instanci JAAS takže není tžeba hatakiri z změnou názvu přihlašovací procedury. Konfigurace se provede v conf/authn/password-authn-config.xml kde zakomentujeme ladap autentifikaci a povolíme JAAS.
+Pro autentifikaci je vzhledem ke komplikovnému schematu nutno použít JAAS, zdá se že JETTY má pro každou virtuální instanci zvláštní instanci JAAS takže není tžeba hatakiri z změnou názvu přihlašovací procedury. Konfigurace se provede v `conf/authn/password-authn-config.xml` kde zakomentujeme ladap autentifikaci a povolíme JAAS.
 ```
     <import resource="jaas-authn-config.xml" />
     <!-- <import resource="krb5-authn-config.xml" /> -->
