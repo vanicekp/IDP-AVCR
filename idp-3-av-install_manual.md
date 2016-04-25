@@ -439,3 +439,42 @@ if (typeof uniqueIdentifier != "undefined" && uniqueIdentifier != null && unique
 }
 eduPersonEntitlement.getValues().add("urn:mace:dir:entitlement:common-lib-terms");
 ```
+# Persistentní identifikátor / eduPersonTargetedID
+## MySQL
+Nainstalujem mysql-server a uděláme základní konfiguraci
+```
+ yum install mysql-server
+ /sbin/chkconfig --levels 235 mysqld on 
+ service mysqld start
+```
+Nastavíme hesla k mysql aby to trochu chodilo, odpovědi na otázky scriptu dejte podle nejlepšího vědomí a svědomí.
+```
+mysql_secure_installation
+```
+# Migrace stávajících identifikátorů
+na původním IDP stahneme databázi identifikátorů
+```
+mysqldump shibboleth > ~/persistentID.sql
+```
+Hesla použijeme z existujícího souboru `attribute-resolver.xml`
+
+Na novém IDP založíme databázi a importujeme data.
+```
+mysql -u root -p
+```
+Zadáme příkazy:
+```
+SET NAMES 'utf8';
+SET CHARACTER SET utf8;
+CHARSET utf8;
+CREATE DATABASE IF NOT EXISTS shibboleth CHARACTER SET=utf8;
+GRANT ALL PRIVILEGES ON shibboleth.* TO 'shibboleth'@'localhost' IDENTIFIED BY 'silne_heslo';
+FLUSH PRIVILEGES;
+```
+Importujeme data
+```
+mysql -u root -p shibboleth < ~/persistentID.sql
+```
+
+## Jetty
+
