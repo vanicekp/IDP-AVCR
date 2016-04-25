@@ -1,5 +1,5 @@
-# Oracle JDK
-
+# Instalace a konfigurace Shibboleth a Jetty pro AV ČR
+## Oracle JDK
 Ačkoliv je v linuxových distribucích mnohdy možnost nainstalovat Javu pomocí b
 alíčkovacího systému dané distribuce, např. OpenJDK, silně doporučujeme to, co S
 hibboleth konzorcium. Použijeme tedy Javu od Oracle. Čas od času se objeví nějaký pr
@@ -11,8 +11,7 @@ DK nainstalujeme:
 ```
 http://www.oracle.com/technetwork/java/javase/downloads/index.html
 ```
-
-### Rozbalení a instalace Oracle JDK
+#### Rozbalení a instalace Oracle JDK
 ```
 cd /opt
 tar -xzf src/jdk-8u77-linux-x64.tar.gz
@@ -22,12 +21,12 @@ echo export JAVA_HOME=/opt/jdk1.8.0_77 >> ~/.bashrc
 ```
 O korektním nastavení právě nainstalovaného Oracle JDK se můžeme přesvědčit následovně.
 
-### Příkaz pro zobrazení aktuálně využívané verze Javy
+#### Příkaz pro zobrazení aktuálně využívané verze Javy
 ```
 alternatives --display java
 ```
 
-### Výstup příkazu pro zobrazení aktuálně využívané verze Javy
+#### Výstup příkazu pro zobrazení aktuálně využívané verze Javy
 ```
 java - auto mode
   link currently points to /opt/jdk1.8.0_77/bin/java
@@ -36,64 +35,59 @@ Current 'best' version is '/opt/jdk1.8.0_77/bin/java'.
 ```
 Můžeme se také přesvědčit zavoláním příkazu java.
 
-### Příkaz pro zobrazení aktuálně využívané verze Javy
+#### Příkaz pro zobrazení aktuálně využívané verze Javy
 ```java -version```
 
-### Výstup příkazu pro zobrazení aktuálně využívané verze Javy
+#### Výstup příkazu pro zobrazení aktuálně využívané verze Javy
 ```
 java version "1.8.0_77"
 Java(TM) SE Runtime Environment (build 1.8.0_77-b03)
 Java HotSpot(TM) 64-Bit Server VM (build 25.77-b03, mixed mode)
 ```
-
 Zda máme správně nastavenou proměnnou prostřední $JAVA_HOME zjistíme, pokud znovu načteme konfigurační soubor interpretu BASH a vyžádáme si hodnotu proměnné $JAVA_HOME.
 
-### Příkaz pro zobrazení hodnoty proměnné $JAVA_HOME
+#### Příkaz pro zobrazení hodnoty proměnné $JAVA_HOME
 ```
 source ~/.bashrc && echo $JAVA_HOME
 ```
-
-### Výstup příkazu pro zobrazení hodnoty proměnné $JAVA_HOME
+#### Výstup příkazu pro zobrazení hodnoty proměnné $JAVA_HOME
 ```
 /opt/jdk1.8.0_77
 ```
-## Java Cryptography Extension (Unlimited Strength Jurisdiction Policy Files)
-
+### Java Cryptography Extension (Unlimited Strength Jurisdiction Policy Files)
 Po nainstalování Oracle JDK je ještě potřeba doinstalovat tzv. JCE US (Java Cryptography Extension Unlimited Strength), které zajistí možnost využít silnější šifrování.
 
 Stáhneme JCE a umístíme jej do adresáře /opt/src.
 ```
 http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html`
 ```
-### Rozbalení archivu s JCE US
+#### Rozbalení archivu s JCE US
 ```
 cd /opt
 unzip -x src/jce_policy-8.zip
 ```
-
 Pro „instalaci“ JCE US stačí zkopírovat dva následující JAR (Java ARchive) soubory do Oracle JDK:
 
-### Instalace JCE US
+#### Instalace JCE US
 ```
 cp UnlimitedJCEPolicyJDK8/US_export_policy.jar jdk1.8.0_77/jre/lib/security/
 cp UnlimitedJCEPolicyJDK8/local_policy.jar jdk1.8.0_77/jre/lib/security/
 ```
 Adresář s rozbaleným rozšířením JCE US můžeme nyní smazat.
 
-### Smazání rozbaleného archivu s JCE US
+#### Smazání rozbaleného archivu s JCE US
 ```
 rm -rf UnlimitedJCEPolicyJDK8/
 ```
 
-# Jetty
-
+## Jetty
 Instalace Jetty je velice jednoduchá, stačí stáhnout zdrojové kódy Jetty do adresáře `/opt/src` a spustit několik následujících příkazů:
 
 ```
 http://download.eclipse.org/jetty/9.3.8.v20160314dist/
 ```
 
-### příkazy zadané do terminálu:
+#### příkazy zadané do terminálu:
 ```
 cd /opt
 mkdir -p jetty/tmp
@@ -110,7 +104,7 @@ JAVA_OPTIONS="-Xmx8192m -Djava.awt.headless=true"
 
 Nyní je potřeba Jetty ještě správně nakonfigurovat. Základní konfigurace probíhá spuštěním Jetty s definováním modulů, které budou pro provoz Shibbolethu potřeba:
 
-### příkazy zadané do terminálu:
+#### příkazy zadané do terminálu:
 ``` 
 cd /opt/jetty
 java -jar /opt/jetty-distribution-9.3.2.v20150730/start.jar \
@@ -118,7 +112,7 @@ java -jar /opt/jetty-distribution-9.3.2.v20150730/start.jar \
 ```
 V souboru `start.d/ssl.ini` je nutné změnit port, na kterém poběží HTTPS:
 
-### příkaz zadaný do terminálu:
+#### příkaz zadaný do terminálu:
 ``` 
 vi start.d/ssl.ini
 ```
@@ -128,14 +122,14 @@ jetty.ssl.port=443
 ```
 V adresáři `/opt/jetty/webapps/root` vytvoříme jednoduchou stránku, která se zobrazí při zadání URL adresy naší instalace Jetty. Toto je sice nepoviné, ale pokud se někdo dostane na stránku samotného IdP, je zajisté dobré, aby stránka nevypadala matoucím dojmem. Obsah souboru index.html si upravte dle svého vlastního uvážení – můžete např. nastavit přesměrování na domovskou stránku své organizace.
 
-### příkazy zadané do terminálu:
+#### příkazy zadané do terminálu:
 ``` 
 mkdir -p /opt/jetty/webapps/root
 vi /opt/jetty/webapps/root/index.html
 ```
 Připravíme si konfigurační soubor idp.xml, pomocí něhož definujeme, který WAR (Web application ARchive) bude obsahovat webovou aplikaci našeho IdP a na jaké adrese (v tomto případě `https://HOSTNAME_SERVERU/idp`) bude přes web IdP naslouchat.
 
-# příkaz zadaný do terminálu:
+#### příkaz zadaný do terminálu:
 ``` 
 vi /opt/jetty/webapps/idp.foo.cas.cz.xml
 ```
@@ -155,14 +149,14 @@ Obsah konfiguračního souboru /opt/jetty/webapps/idp.foo.cas.cz.xml je následu
     <Set name="tempDirectory">/opt/jetty/tmp/idp.foo.cas.cz</Set>
 </Configure>
 ```
-### Musíme založit adresář `/opt/jetty/tmp`
+#### Musíme založit adresář `/opt/jetty/tmp`
 ```
 mkdir /opt/jetty/tmp
 ```
 
 Tímto máme Jetty téměř připraveno. Zatím jej však nebudeme pouštět, jelikož stejně nemáme nainstalovaný Shibboleth IdP a tedy idp.war zatím neexistuje. Navíc jsme ještě nenakonfigurovali SSL certifikát, aby bylo možné k Shibbolethu přistupovat přes HTTPS.
 
-## SSL certifikát
+### SSL certifikát
 
 Nyní je ještě potřeba nakonfigurovat použití SSL certifikátu v Jetty, aby bylo možné provozovat Shibboleth IdP přes HTTPS. K tomuto účelu slouží u Javy tzv. „keystore“. Pro korektní zprovoznění HTTPS je potřeba, aby se do klíčenky („keystore“) uložil SSL certifikát včetně kompletního řetězce až ke kořenovému certifikátu certifikační autority (CA).
 
