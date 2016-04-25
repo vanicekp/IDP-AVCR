@@ -477,4 +477,21 @@ mysql -u root -p shibboleth < ~/persistentID.sql
 ```
 
 ## Jetty
+Jetty potřebuje pro správnou funkčnost tyto tři JAR soubory, které je nutné umístit do složky s externími knihovnami `/opt/jetty/lib/ext`: 
+
+commons-dbcp-1.4.jar http://search.maven.org/remotecontent?filepath=commons-dbcp/commons-dbcp/1.4/commons-dbcp-1.4.jar
+commons-pool-1.6.jar http://search.maven.org/remotecontent?filepath=commons-pool/commons-pool/1.6/commons-pool-1.6.jar
+mysql-connector-java-5.1.36-bin.jar http://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.36.tar.gz
+
+### Apache Commons DBCP & Pool
+```
+cd /opt/src/
+cp commons-dbcp-1.4.jar commons-pool-1.6.jar /opt/jetty/lib/ext/
+```
+### MySQL Connector/J
+```
+cd /opt/src/
+tar -xzf mysql-connector-java-5.1.36.tar.gz
+cp mysql-connector-java-5.1.36/mysql-connector-java-5.1.36-bin.jar /opt/jetty/lib/ext/
+```
 
