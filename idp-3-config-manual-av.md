@@ -263,6 +263,10 @@ V souboru `conf/logback.xml` změníme úroveň logování na `WARN` a `DEBUG`.
 # Konfigurace eduPersonTargetedID 
 Konfigurace nutné v souboru `attribute-resolver.xml` již jsou v matrici.
 
+Konfigurační soubor `global.xml` pou6ijeme z matrice.
+```
+cp /opt/templates/shibboleth/global.xml conf/
+```
 Konfigurační soubor `saml-nameid.properties` použijeme z matrice.
 ```
 cp /opt/templates/shibboleth/saml-nameid.properties conf/
