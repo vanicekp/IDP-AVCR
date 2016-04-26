@@ -332,14 +332,14 @@ Hned za `EntityDescriptor` přijde vložení extension pro edugain.
 Do `IDPSSODescriptor` extension vložíme informace o ústau a logách.
 ```
             <mdui:UIInfo xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui">
-                 <mdui:DisplayName xml:lang="en">Institute of Information Theory and Automation AS CR</mdui:DisplayName>
-                 <mdui:DisplayName xml:lang="cs">Ústav teorie informace a automatizace AV ČR</mdui:DisplayName>
-                 <mdui:Description xml:lang="en">Identity Provider UTIA AV CR employees.</mdui:Description>
-                 <mdui:Description xml:lang="cs">Identity Provider pro zaměstnance ÚTIA AV ČR</mdui:Description>
-                 <mdui:InformationURL xml:lang="en">http://www.utia.cas.cz/</mdui:InformationURL>
-                 <mdui:InformationURL xml:lang="cs">http://www.utia.cas.cz/</mdui:InformationURL>
-                 <mdui:Logo height="44" width="74">https://jiftach.cas.cz/loga/logo-utia-44.png</mdui:Logo>
-                 <mdui:Logo height="411" width="960">https://jiftach.cas.cz/loga/logo-utia-411.png</mdui:Logo>
+                 <mdui:DisplayName xml:lang="en">English name institution AS CR</mdui:DisplayName>
+                 <mdui:DisplayName xml:lang="cs">Český název ústavu AV ČR</mdui:DisplayName>
+                 <mdui:Description xml:lang="en">Identity Provider FOO AV CR employees.</mdui:Description>
+                 <mdui:Description xml:lang="cs">Identity Provider pro zaměstnance FOO AV ČR</mdui:Description>
+                 <mdui:InformationURL xml:lang="en">http://www.foo.cas.cz/</mdui:InformationURL>
+                 <mdui:InformationURL xml:lang="cs">http://www.foo.cas.cz/</mdui:InformationURL>
+                 <mdui:Logo height="44" width="XX">https://gedeon.cas.cz/loga/logo-foo-44.png</mdui:Logo>
+                 <mdui:Logo height="XX" width="XX">https://gedeon.cas.cz/loga/logo-foo-xx.png</mdui:Logo>
            </mdui:UIInfo>
 ```
 K dvěma řádkům `NameIDFormat` přidáme třetí řádek pro perzistentní ID.
@@ -349,12 +349,12 @@ K dvěma řádkům `NameIDFormat` přidáme třetí řádek pro perzistentní ID
 Skoro na konec, před závěrečný tag `</EntityDescriptor>` vložíme informace o ústavu a technickém kontaktu.
 ```
    <Organization>
-      <OrganizationName xml:lang="en">Test AV CR</OrganizationName>
-      <OrganizationName xml:lang="cs">Test AV ČR</OrganizationName>
-      <OrganizationDisplayName xml:lang="en">Test, Public Research Institution</OrganizationDisplayName>
-      <OrganizationDisplayName xml:lang="cs">Test AV ČR, v.v.i.</OrganizationDisplayName>
-      <OrganizationURL xml:lang="en">http://www.test.cas.cz/</OrganizationURL>
-      <OrganizationURL xml:lang="cs">http://www.test.cas.cz/</OrganizationURL>
+      <OrganizationName xml:lang="en">foo AV CR</OrganizationName>
+      <OrganizationName xml:lang="cs">foo AV ČR</OrganizationName>
+      <OrganizationDisplayName xml:lang="en">English name institution</OrganizationDisplayName>
+      <OrganizationDisplayName xml:lang="cs">Český název ústavu AV ČR</OrganizationDisplayName>
+      <OrganizationURL xml:lang="en">http://www.foo.cas.cz/</OrganizationURL>
+      <OrganizationURL xml:lang="cs">http://www.foo.cas.cz/</OrganizationURL>
     </Organization>
 
     <ContactPerson contactType="technical">
@@ -363,4 +363,3 @@ Skoro na konec, před závěrečný tag `</EntityDescriptor>` vložíme informac
       <EmailAddress>vanicekp@utia.cas.cz</EmailAddress>
     </ContactPerson>
 ```
-
