@@ -296,3 +296,19 @@ Přegenerujte JAR Shibbolethu a restartujeme jetty
 ./bin/build.sh
 /etc/init.d/jetty restart
 ```
+## Perzonifikace login stránky a log a chybových hlášek
+Logo umístíme do adresáře `edit-webapp/images` optimální výška loga je 100px. 
+Soubory se "zprávama" umístíme z matrice do adresáře `messages`.
+```
+cp /opt/templates/shibboleth/messages/* messages/
+```
+V souborech `error-messages.properties` a `error-messages_cs.properties` doplníme správné `NAME` (2x) a `LOGO`.
+Nahradíme logovací stánku upravenou o vložený text.
+```
+cp /opt/templates/shibboleth/login.vm views/
+```
+Přegenerujte JAR Shibbolethu a restartujeme jetty
+```
+./bin/build.sh
+/etc/init.d/jetty restart
+```
