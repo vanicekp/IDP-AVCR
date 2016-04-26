@@ -387,9 +387,61 @@ Konfigurace LDAP connectoru v conf/ldap.properties opět nefunguje, nejspíše "
         </dc:FilterTemplate>
     </resolver:DataConnector>
 ```
+## metadata-providers
+
+V konfiguračním souboru `conf/metadata-providers.xml` se nastavuje zdroj metadat. 
+
+#### příkaz zadaný do terminálu:
+``` 
+vi /opt/shibboleth-idp/conf/metadata-providers.xml
+```
+```
+<!-- czTestFed -->
+<MetadataProvider
+    id="cztestfed-metadata"
+    xsi:type="FileBackedHTTPMetadataProvider"
+    backingFile="%{idp.home}/metadata/cztestfed.xml"
+    metadataURL="https://metadata.eduid.cz/entities/cztestfed"
+    maxRefreshDelay="PT15M">
+    <MetadataFilter
+        xsi:type="SignatureValidation"
+        requireSignedMetadata="true"
+        certificateFile="%{idp.home}/credentials/metadata.eduid.cz.crt.pem" />
+</MetadataProvider>
+```
+```
+<!-- eduID.cz -->
+<MetadataProvider
+    id="eduid-metadata"
+    xsi:type="FileBackedHTTPMetadataProvider"
+    backingFile="%{idp.home}/metadata/eduid.xml"
+    metadataURL="https://metadata.eduid.cz/entities/eduid+sp"
+    maxRefreshDelay="PT15M">
+    <MetadataFilter
+        xsi:type="SignatureValidation"
+        requireSignedMetadata="true"
+        certificateFile="%{idp.home}/credentials/metadata.eduid.cz.crt.pem" />
+</MetadataProvider>
+```
+```
+<!-- eduGAIN -->
+<MetadataProvider
+    id="edugain-metadata"
+    xsi:type="FileBackedHTTPMetadataProvider"
+    backingFile="%{idp.home}/metadata/edugain.xml"
+    metadataURL="https://metadata.eduid.cz/entities/edugain+sp"
+    maxRefreshDelay="PT1H">
+    <MetadataFilter
+        xsi:type="SignatureValidation"
+        requireSignedMetadata="true"
+        certificateFile="%{idp.home}/credentials/metadata.eduid.cz.crt.pem" />
+</MetadataProvider>
+```
+Veřejný klíč je k dispozici na adrese `https://www.eduid.cz/docs/eduid/metadata/metadata.eduid.cz.crt.pem`. Stáhněte ho a uložte do adresáře `credentials`.
 
 ## attribute-resolver
 V souboru `attribute-resolver.xml` definujeme attributy
+
 
 ### Skripty pro shibboleth 3
 Protože Java 8 změnila engine pro vnořené javascripty a zároveň shibbolet 3 změnil částčně API pro psaní javascriptů bylo nutné upravit scripty pro odháčkování a  eduPersonEntitlement.
