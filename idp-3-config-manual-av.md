@@ -312,3 +312,48 @@ Přegenerujte JAR Shibbolethu a restartujeme jetty
 ./bin/build.sh
 /etc/init.d/jetty restart
 ```
+## Úprava metadat
+Metadata nalezneme v adresáři metadata. V souboru je třeba doplnit několik údajů.
+Hned za `EntityDescriptor` přijde vložení extension pro edugain.
+```
+    <Extensions xmlns="urn:oasis:names:tc:SAML:2.0:metadata">
+        <eduidmd:RepublishRequest xmlns:eduidmd="http://eduid.cz/schema/metadata/1.0">
+            <eduidmd:RepublishTarget>http://edugain.org/</eduidmd:RepublishTarget>
+        </eduidmd:RepublishRequest>
+    </Extensions>
+```
+Do `IDPSSODescriptor` extension vložíme informace o ústau a logách.
+```
+            <mdui:UIInfo xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui">
+                 <mdui:DisplayName xml:lang="en">Institute of Information Theory and Automation AS CR</mdui:DisplayName>
+                 <mdui:DisplayName xml:lang="cs">Ústav teorie informace a automatizace AV ČR</mdui:DisplayName>
+                 <mdui:Description xml:lang="en">Identity Provider UTIA AV CR employees.</mdui:Description>
+                 <mdui:Description xml:lang="cs">Identity Provider pro zaměstnance ÚTIA AV ČR</mdui:Description>
+                 <mdui:InformationURL xml:lang="en">http://www.utia.cas.cz/</mdui:InformationURL>
+                 <mdui:InformationURL xml:lang="cs">http://www.utia.cas.cz/</mdui:InformationURL>
+                 <mdui:Logo height="44" width="74">https://jiftach.cas.cz/loga/logo-utia-44.png</mdui:Logo>
+                 <mdui:Logo height="411" width="960">https://jiftach.cas.cz/loga/logo-utia-411.png</mdui:Logo>
+           </mdui:UIInfo>
+```
+K dvěma řádkům `NameIDFormat` přidáme třetí řádek pro perzistentní ID.
+```
+        <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>
+```
+Skoro na konec, před závěrečný tag `</EntityDescriptor>` vložíme informace o ústavu a technickém kontaktu.
+```
+   <Organization>
+      <OrganizationName xml:lang="en">Test AV CR</OrganizationName>
+      <OrganizationName xml:lang="cs">Test AV ČR</OrganizationName>
+      <OrganizationDisplayName xml:lang="en">Test, Public Research Institution</OrganizationDisplayName>
+      <OrganizationDisplayName xml:lang="cs">Test AV ČR, v.v.i.</OrganizationDisplayName>
+      <OrganizationURL xml:lang="en">http://www.test.cas.cz/</OrganizationURL>
+      <OrganizationURL xml:lang="cs">http://www.test.cas.cz/</OrganizationURL>
+    </Organization>
+
+    <ContactPerson contactType="technical">
+      <GivenName>Petr</GivenName>
+      <SurName>Vaníček</SurName>
+      <EmailAddress>vanicekp@utia.cas.cz</EmailAddress>
+    </ContactPerson>
+```
+
