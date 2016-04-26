@@ -228,6 +228,13 @@ ShibUserPassAuth {
 };
 ```
 
+## metadata-providers.xml
+V souboru `metadata-providers.xml` je definice zdrojů metadat pro IDP. Nastavení provedeme zkopiírováním z templates. Kopírujeme soubor `metadata-provaiders.xml` a podpisový klíč `metadata.eduid.cz.crt.pem`.
+```
+cp /opt/templates/shibboleth/metadata-providers.xml conf/
+cp /opt/templates/shibboleth/metadata.eduid.cz.crt.pem credentials/
+```
+
 ## attribute-resolver.xml
 V souboru `attribute-resolver.xml` je definice získávání atributů z LDAPu, mysql, statické konfigurace. Pro nás účel použijeme matrici ze souboru `/opt/templates/shibboleth/attribute-resolver.xml`.
 ```
