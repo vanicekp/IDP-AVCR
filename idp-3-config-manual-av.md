@@ -18,11 +18,11 @@ cd /opt/dist
 cp -r /opt/src/shibboleth-identity-provider-3.1.2 idp.foo.cas.cz-source
 ```
 #### Změna idp.home
-V souboru `idp.foo.cas.cz-source/webapp/WEB-INF/web.xml` musíme doplnit definici proměné `idp.home`, jinak bude instalace předpokládat umístění v defaultním adresáři `/opt/shibboleth-idp`.
+V souboru `idp.foo.cas.cz-source/webapp/WEB-INF/web.xml` musíme doplnit definici proměnné `idp.home`, jinak bude instalace předpokládat umístění v defaultním adresáři `/opt/shibboleth-idp`.
 ```
 vi idp.foo.cas.cz-source/webapp/WEB-INF/web.xml
 ```
-Za parametr `<display-name>` volžíme 
+Za parametr `<display-name>` vložíme 
 ```
 <context-param>
     <param-name>idp.home</param-name>
@@ -98,7 +98,7 @@ Editujeme:
 </entry>
 ```
 #### Perzonifikace loga pro identifikaci virtuálu
-Do adresáře `/opt/idp/idp.foo.cas.cz/edit-webapp/images` dáme místo prázdného loga logo pro rozlišení virtuálu při chyboových hláškách, v opačném případě nepoznáme který virtuál vygeneroval chybu, není to na stránce napsané.
+Do adresáře `/opt/idp/idp.foo.cas.cz/edit-webapp/images` dáme místo prázdného loga logo pro rozlišení virtuálu při chybových hláškách. V opačném případě nepoznáme, který virtuál vygeneroval chybu, není to na stránce napsané.
 ```
 cp  ~/loga/foo.png edit-webapp/images/dummylogo.png
 ./bin/build.sh
@@ -135,7 +135,7 @@ Restartujeme Jetty, čímž dosáhneme nahrání servletu s Shibboleth IdP:
 ``` 
 /etc/init.d/jetty restart
 ```
-Nyní můžeme vyzkoušet, zda-li Shibboleth IdP běží 
+Nyní můžeme vyzkoušet, zdali Shibboleth IdP běží 
 
 V prohlížeči dáme URL
 ```
@@ -192,7 +192,7 @@ last reload attempt: 2016-04-19T07:06:42Z
 Můžete také zkusit ze svého počítače přístoupit na URL adresu s IdP: `https://idp.foo.cas.cz/idp`. Nicméně neuvidíte nic zajímavého. 
 
 ## JAAS autentifikace
-Pro autentifikaci je vzhledem ke komplikovnému schematu nutno použít JAAS, zdá se že JETTY má pro každou virtuální instanci zvláštní instanci JAAS takže není tžeba hatakiri z změnou názvu přihlašovací procedury. Konfigurace se provede v `conf/authn/password-authn-config.xml` kde zakomentujeme ladap autentifikaci a povolíme JAAS.
+Pro autentifikaci je vzhledem ke komplikovanému schématu nutno použít JAAS. Zdá se, že JETTY má pro každou virtuální instanci zvláštní instanci JAAS, takže není třeba harakiri se změnou názvu přihlašovací procedury. Konfigurace se provede v `conf/authn/password-authn-config.xml`, kde zakomentujeme ladap autentifikaci a povolíme JAAS.
 ```
     <import resource="jaas-authn-config.xml" />
     <!-- <import resource="krb5-authn-config.xml" /> -->
@@ -229,14 +229,14 @@ ShibUserPassAuth {
 ```
 
 ## metadata-providers.xml
-V souboru `metadata-providers.xml` je definice zdrojů metadat pro IDP. Nastavení provedeme zkopiírováním z templates. Kopírujeme soubor `metadata-provaiders.xml` a podpisový klíč `metadata.eduid.cz.crt.pem`.
+V souboru `metadata-providers.xml` je definice zdrojů metadat pro IDP. Nastavení provedeme zkopírováním z templates. Kopírujeme soubor `metadata-provaiders.xml` a podpisový klíč `metadata.eduid.cz.crt.pem`.
 ```
 cp /opt/templates/shibboleth/metadata-providers.xml conf/
 cp /opt/templates/shibboleth/metadata.eduid.cz.crt.pem credentials/
 ```
 
 ## attribute-resolver.xml
-V souboru `attribute-resolver.xml` je definice získávání atributů z LDAPu, mysql, statické konfigurace. Pro nás účel použijeme matrici ze souboru `/opt/templates/shibboleth/attribute-resolver.xml`.
+V souboru `attribute-resolver.xml` je definice získávání atributů z LDAPu, mysql, statické konfigurace. Pro náš účel použijeme matrici ze souboru `/opt/templates/shibboleth/attribute-resolver.xml`.
 ```
 cp /opt/templates/shibboleth/attribute-resolver.xml conf
 ```
@@ -270,7 +270,7 @@ V souboru `conf/logback.xml` změníme úroveň logování na `WARN` a `DEBUG`.
 ## Konfigurace eduPersonTargetedID 
 Konfigurace nutné v souboru `attribute-resolver.xml` již jsou v matrici.
 
-Konfigurační soubor `global.xml` pou6ijeme z matrice.
+Konfigurační soubor `global.xml` použijeme z matrice.
 ```
 cp /opt/templates/shibboleth/global.xml conf/
 ```
@@ -282,7 +282,7 @@ Konfigurační soubor `saml-nameid.xml` použijeme z matrice.
 ```
 cp /opt/templates/shibboleth/saml-nameid.xml conf/
 ```
-Soubor `subject-c14n.xml` pou6ijeme z matrice.
+Soubor `subject-c14n.xml` použijeme z matrice.
 ```
 cp /opt/templates/shibboleth/subject-c14n.xml conf/c14n
 ```
@@ -290,7 +290,7 @@ V metadatech IdP je potřeba zadat, že IdP podporuje persistentní identifikát
 ```
 vi metadata/idp-metadata.xml
 ```
-Přidejte tedy do elementu `<IDPSSODescriptor>` následující řádek ke zbývajícím dvoum elementům `<NameIDFormat>`.
+Přidejte tedy do elementu `<IDPSSODescriptor>` následující řádek ke zbývajícím dvěma elementům `<NameIDFormat>`.
 ```
 <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>
 ```
@@ -298,14 +298,14 @@ Přidáme knihovnu JSTL do shibbolethu.
 ```
 cp /opt/src/jstl-1.2.jar edit-webapp/WEB-INF/lib
 ```
-Přegenerujte JAR Shibbolethu a restartujeme jetty
+Přegenerujte JAR Shibbolethu a restartujeme jetty.
 ```
 ./bin/build.sh
 /etc/init.d/jetty restart
 ```
 ## Perzonifikace login stránky a log a chybových hlášek
-Logo umístíme do adresáře `edit-webapp/images` optimální výška loga je 100px. 
-Soubory se "zprávama" umístíme z matrice do adresáře `messages`.
+Logo umístíme do adresáře `edit-webapp/images`, optimální výška loga je 100px. 
+Soubory se "zprávami" umístíme z matrice do adresáře `messages`.
 ```
 cp /opt/templates/shibboleth/messages/* messages/
 ```
@@ -314,7 +314,7 @@ Nahradíme logovací stánku upravenou o vložený text.
 ```
 cp /opt/templates/shibboleth/login.vm views/
 ```
-Přegenerujte JAR Shibbolethu a restartujeme jetty
+Přegenerujte JAR Shibbolethu a restartujeme jetty.
 ```
 ./bin/build.sh
 /etc/init.d/jetty restart
@@ -329,7 +329,7 @@ Hned za `EntityDescriptor` přijde vložení extension pro edugain.
         </eduidmd:RepublishRequest>
     </Extensions>
 ```
-Do `IDPSSODescriptor` extension vložíme informace o ústau a logách.
+Do `IDPSSODescriptor` extension vložíme informace o ústavu a logách.
 ```
             <mdui:UIInfo xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui">
                  <mdui:DisplayName xml:lang="en">English name institution AS CR</mdui:DisplayName>
@@ -346,7 +346,7 @@ K dvěma řádkům `NameIDFormat` přidáme třetí řádek pro perzistentní ID
 ```
         <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>
 ```
-Skoro na konec, před závěrečný tag `</EntityDescriptor>` vložíme informace o ústavu a technickém kontaktu.
+Skoro na konec, před závěrečný tag `</EntityDescriptor>`, vložíme informace o ústavu a technickém kontaktu.
 ```
    <Organization>
       <OrganizationName xml:lang="en">foo AV CR</OrganizationName>
