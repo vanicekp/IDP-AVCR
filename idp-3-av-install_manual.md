@@ -2,8 +2,7 @@
 ## Oracle JDK
 Ačkoliv je v linuxových distribucích mnohdy možnost nainstalovat Javu pomocí balíčkovacího systému dané distribuce, např. OpenJDK, silně doporučujeme to, co Shibboleth konzorcium. Použijeme tedy Javu od Oracle. Čas od času se objeví nějaký problém způsobený použitím např. OpenJDK. Budeme-li žádat o podporu, může se stát, že budeme vyzváni, abychom problém reprodukovali s využitím Javy od společnosti Oracle.
 
-Po stažení Oracle JDK umístíme archiv do adresáře `/opt/src` a pomocí následujících příkazů J
-DK nainstalujeme:
+Po stažení Oracle JDK umístíme archiv do adresáře `/opt/src` a pomocí následujících příkazů JDK nainstalujeme:
 ```
 http://www.oracle.com/technetwork/java/javase/downloads/index.html
 ```
@@ -92,7 +91,7 @@ ln -snf /opt/jetty-distribution-9.3.8.v20160314/bin/jetty.sh /etc/init.d/jetty
 echo "JETTY_HOME=/opt/jetty-distribution-99.3.8.v20160314 >> /etc/default/jetty
 echo "JETTY_BASE=/opt/jetty" >> /etc/default/jetty
 ```
-Pokud dojde k pořebě zvýšit velikost paměti pro běh jetty což se nedá při větším počtu virtuálů odhadnout, udělá se to
+Pokud dojde k potřebě zvýšit velikost paměti pro běh Jetty, což se nedá při větším počtu virtuálů odhadnout, udělá se to
 v `/etc/default/jetty`.
 ```
 JAVA_OPTIONS="-Xmx8192m -Djava.awt.headless=true"
@@ -116,7 +115,7 @@ Výchozí nastavení jetty.ssl.port=8443 změníme následovně:
 ```
 jetty.ssl.port=443
 ```
-V adresáři `/opt/jetty/webapps/root` vytvoříme jednoduchou stránku, která se zobrazí při zadání URL adresy naší instalace Jetty. Toto je sice nepoviné, ale pokud se někdo dostane na stránku samotného IdP, je zajisté dobré, aby stránka nevypadala matoucím dojmem. Obsah souboru index.html si upravte dle svého vlastního uvážení – můžete např. nastavit přesměrování na domovskou stránku své organizace.
+V adresáři `/opt/jetty/webapps/root` vytvoříme jednoduchou stránku, která se zobrazí při zadání URL adresy naší instalace Jetty. Toto je sice nepovinné, ale pokud se někdo dostane na stránku samotného IdP, je zajisté dobré, aby stránka nevypadala matoucím dojmem. Obsah souboru index.html si upravte dle svého vlastního uvážení – můžete např. nastavit přesměrování na domovskou stránku své organizace.
 
 #### příkazy zadané do terminálu:
 ``` 
@@ -238,8 +237,9 @@ jetty.sslContext.keyStorePassword=OBF:1u9x1vn61z0p1yta1ytc1z051vnw1u9l
 jetty.sslContext.keyManagerPassword=OBF:1sot1w1c1uvk1vo01unz1thb1unz1vn21uum1w261sox
 jetty.sslContext.trustStorePassword=OBF:1u9x1vn61z0p1yta1ytc1z051vnw1u9l
 ```
-Proměnné `jetty.sslContext.keyStorePassword` a `jetty.sslContext.trustStorePassword` nastavte na obfuskované heslo ke „keystore“. Proměnnou `jetty.sslContext.keyManagerPassword` nastavte na obfuskované heslo ke klíči certifikátu (soubor jetty-cert.pkcs12!). Pokud to popletete, Jetty odmítne nastartovat, jelikož nepřečte keystore a klíč.
-SSL konfigurace
+Proměnné `jetty.sslContext.keyStorePassword` a `jetty.sslContext.trustStorePassword` nastavte na obfuskované heslo ke „keystore“. Proměnnou `jetty.sslContext.keyManagerPassword` nastavte na obfuskované heslo ke klíči certifikátu (soubor jetty-cert.pkcs12). Pokud to popletete, Jetty odmítne nastartovat, jelikož nepřečte keystore a klíč.
+
+### SSL konfigurace
 
 Výchozí konfigurace Jetty umožňuje použití i dnes již nepříliš důvěryhodných šifer. Proto jejich použití v konfiguraci zakážeme.
 
@@ -249,7 +249,7 @@ cd /opt/jetty
 cp ../jetty-distribution-9.3.8.v20160314/etc/jetty-ssl-context.xml etc/
 vi etc/jetty-ssl-context.xml
 ```
-Konfigurační soubor jetty-ssl-context.xml, který jsme zkopírovali z distribučního adresáře Jetty,je treba doplnit o seznam zakázaných šifer:
+Konfigurační soubor jetty-ssl-context.xml, který jsme zkopírovali z distribučního adresáře Jetty, je třeba doplnit o seznam zakázaných šifer:
 
 ```
 <Set name="ExcludeCipherSuites">
@@ -276,9 +276,10 @@ A nyní ještě zahrneme do konfigurace šifry pro podporu „Forward Secrecy“
 ```
 
 S tímto nastavením by mělo být zabezpečení komunikace na výrazně vyšší úrovni.
-Shibboleth CLI skripty & HTTP
 
-Chcete-li využívat Shibboleth CLI skripty (není potřeba, avšak vřele doporučuji, jelikož je možné požádat o „reload“ konfigurace z shellu serveru bez nutnosti restartovat celý javovský Jetty kontejner), je vhodné, aby byl Shibboleth dostupný i přes HTTP na localhosti (https://localhost/idp). Bezpečného řešení lze docílit spuštěním Jetty přes HTTP pouze na adrese lokálního rozhraní 127.0.0.1.
+### Shibboleth CLI skripty & HTTP
+
+Chcete-li využívat Shibboleth CLI skripty (není potřeba, avšak vřele doporučuji, jelikož je možné požádat o „reload“ konfigurace z shellu serveru bez nutnosti restartovat celý javovský Jetty kontejner), je vhodné, aby byl Shibboleth dostupný i přes HTTP na localhostu (https://localhost/idp). Bezpečného řešení lze docílit spuštěním Jetty přes HTTP pouze na adrese lokálního rozhraní 127.0.0.1.
 
 Druhou možností je spouštět skript reload-service.sh s parametrem -u, pomocí něhož definujeme alternativní adresu (např. https://idp.foo.cas.cz) a tím pádem tedy Jetty na HTTP portu poslouchat nemusí. Pro zjednodušení je možné udělat tzv. alias v interpretu příkazů, abyste se vyhnuli zadávání -u <URL>.
 
@@ -333,7 +334,7 @@ wget -q -O - http://127.0.0.1
 Měli byste vidět obsah souboru `/opt/jetty/webapps/root/index.html`. 
 
 ## Hack pro Oracle LDAP
-Protože nějak blbne LDAP od Oracle a Java 8 si s ním odmítá povídat, bylo nutné to vyřešit hackem přez stunnel.
+Protože nějak blbne LDAP od Oracle a Java 8 si s ním odmítá povídat, bylo nutné to vyřešit hackem přes stunnel.
 Konfigurační soubor /etc/stunnel/stunnel.conf.
 ```
 socket = l:TCP_NODELAY=1
@@ -348,7 +349,7 @@ Je nutno  použít verzi stunnelu minimálně 5. Ta z distribuce centos 6 nefung
 Startování stunnelu je v `/etc/rc.local`.
 
 ## JAAS
-Pro autentifikaci je vzhledem ke komplikovnému schematu nutno použít JAAS, zdá se že JETTY má pro každou virtuální instanci zvláštní instanci JAAS takže není třeba harakiri z změnou názvu přihlašovací procedury. Konfigurace se provede v `conf/authn/password-authn-config.xml` kde zakomentujeme ladap autentifikaci a povolíme JAAS.
+Pro autentifikaci je vzhledem ke komplikovnému schématu nutno použít JAAS. Zdá se, že JETTY má pro každou virtuální instanci zvláštní instanci JAAS, takže není třeba harakiri se změnou názvu přihlašovací procedury. Konfigurace se provede v `conf/authn/password-authn-config.xml`, kde zakomentujeme ladap autentifikaci a povolíme JAAS.
 ```
     <import resource="jaas-authn-config.xml" />
     <!-- <import resource="krb5-authn-config.xml" /> -->
@@ -436,11 +437,10 @@ vi /opt/shibboleth-idp/conf/metadata-providers.xml
 Veřejný klíč je k dispozici na adrese `https://www.eduid.cz/docs/eduid/metadata/metadata.eduid.cz.crt.pem`. Stáhněte ho a uložte do adresáře `credentials`.
 
 ## attribute-resolver
-V souboru `attribute-resolver.xml` definujeme attributy
-
+V souboru `attribute-resolver.xml` definujeme atributy.
 
 ### Skripty pro shibboleth 3
-Protože Java 8 změnila engine pro vnořené javascripty a zároveň shibbolet 3 změnil částčně API pro psaní javascriptů bylo nutné upravit scripty pro odháčkování a  eduPersonEntitlement.
+Protože Java 8 změnila engine pro vnořené javascripty a zároveň shibbolet 3 změnil částčně API pro psaní javascriptů, bylo nutné upravit scripty pro odháčkování a `eduPersonEntitlement`.
 
 Script `/opt/idp/common/script/commonNameASCII.js`
 ```
@@ -483,7 +483,7 @@ eduPersonEntitlement.getValues().add("urn:mace:dir:entitlement:common-lib-terms"
 ```
 ## Persistentní identifikátor / eduPersonTargetedID
 ### MySQL
-Nainstalujem mysql-server a uděláme základní konfiguraci
+Nainstalujeme mysql-server a uděláme základní konfiguraci
 ```
  yum install mysql-server
  /sbin/chkconfig --levels 235 mysqld on 
@@ -494,7 +494,7 @@ Nastavíme hesla k mysql aby to trochu chodilo, odpovědi na otázky scriptu dej
 mysql_secure_installation
 ```
 #### Migrace stávajících identifikátorů
-na původním IDP stahneme databázi identifikátorů
+na původním IDP stáhneme databázi identifikátorů
 ```
 mysqldump shibboleth > ~/persistentID.sql
 ```
@@ -521,9 +521,11 @@ mysql -u root -p shibboleth < ~/persistentID.sql
 ### Jetty
 Jetty potřebuje pro správnou funkčnost tyto tři JAR soubory, které je nutné umístit do složky s externími knihovnami `/opt/jetty/lib/ext`: 
 
-commons-dbcp-1.4.jar http://search.maven.org/remotecontent?filepath=commons-dbcp/commons-dbcp/1.4/commons-dbcp-1.4.jar
-commons-pool-1.6.jar http://search.maven.org/remotecontent?filepath=commons-pool/commons-pool/1.6/commons-pool-1.6.jar
-mysql-connector-java-5.1.36-bin.jar http://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.36.tar.gz
+commons-dbcp-1.4.jar `http://search.maven.org/remotecontent?filepath=commons-dbcp/commons-dbcp/1.4/commons-dbcp-1.4.jar`
+
+commons-pool-1.6.jar `http://search.maven.org/remotecontent?filepath=commons-pool/commons-pool/1.6/commons-pool-1.6.jar`
+
+mysql-connector-java-5.1.36-bin.jar `http://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.36.tar.gz`
 
 #### Apache Commons DBCP & Pool
 ```
@@ -563,7 +565,7 @@ A poté je potřeba nadefinovat konektor. Salt jsem vzal ze staré instalace.
     <dc:BeanManagedConnection>shibboleth.MySQLDataSource</dc:BeanManagedConnection>
 </resolver:DataConnector>
 ```
-Nyní je potřeba v souboru `conf/global.xml` definovat bean-y“. 
+Nyní je potřeba v souboru `conf/global.xml` definovat bean-y. 
 ```
 vi conf/global.xml
 ```
@@ -593,7 +595,7 @@ Konfigurační soubor `saml-nameid.properties` je potřeba také upravit.
 ```
 vi conf/saml-nameid.properties
 ```
-Zde definujeme odkazy na výše definované bean-y, dále atribut, který se bude pro výpočet persistentního identifikátoru používat (uid) a sůl použitou pro výpočet (tu jste si již vygenerovali výše).
+Zde definujeme odkazy na výše definované bean-y, dále atribut, který se bude pro výpočet persistentního identifikátoru používat (uid) a salt použitou pro výpočet (tu jste si již vygenerovali výše).
 ```
 idp.persistentId.generator = shibboleth.StoredPersistentIdGenerator
 idp.persistentId.store = PersistentIdStore
@@ -620,7 +622,7 @@ V metadatech IdP je potřeba zadat, že IdP podporuje persistentní identifikát
 ```
 vi /opt/shibboleth-idp/metadata/idp-metadata.xml
 ```
-Přidejte tedy do elementu `<IDPSSODescriptor>` následující řádek ke zbývajícím dvoum elementům `<NameIDFormat>`.
+Přidejte tedy do elementu `<IDPSSODescriptor>` následující řádek ke zbývajícím dvěma elementům `<NameIDFormat>`.
 ```
 <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>
 ```
