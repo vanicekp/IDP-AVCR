@@ -1,10 +1,6 @@
 # Instalace a konfigurace Shibboleth a Jetty pro AV ČR
 ## Oracle JDK
-Ačkoliv je v linuxových distribucích mnohdy možnost nainstalovat Javu pomocí b
-alíčkovacího systému dané distribuce, např. OpenJDK, silně doporučujeme to, co S
-hibboleth konzorcium. Použijeme tedy Javu od Oracle. Čas od času se objeví nějaký pr
-oblém způsobený použitím např. OpenJDK. Budeme-li žádat o podporu, může se stát, že b
-udeme vyzváni, abychom problém reprodukovali s využitím Javy od společnosti Oracle.
+Ačkoliv je v linuxových distribucích mnohdy možnost nainstalovat Javu pomocí balíčkovacího systému dané distribuce, např. OpenJDK, silně doporučujeme to, co Shibboleth konzorcium. Použijeme tedy Javu od Oracle. Čas od času se objeví nějaký problém způsobený použitím např. OpenJDK. Budeme-li žádat o podporu, může se stát, že budeme vyzváni, abychom problém reprodukovali s využitím Javy od společnosti Oracle.
 
 Po stažení Oracle JDK umístíme archiv do adresáře `/opt/src` a pomocí následujících příkazů J
 DK nainstalujeme:
