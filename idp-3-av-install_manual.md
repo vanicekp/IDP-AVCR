@@ -517,6 +517,12 @@ Importujeme data
 ```
 mysql -u root -p shibboleth < ~/persistentID.sql
 ```
+### /etc/my.cnf
+Do konfiguračního souboru přidáme delší timeout.
+```
+[mysqld]
+wait_timeout=31536000
+```
 
 ### Jetty
 Jetty potřebuje pro správnou funkčnost tyto tři JAR soubory, které je nutné umístit do složky s externími knihovnami `/opt/jetty/lib/ext`: 
