@@ -574,7 +574,7 @@ Následující konfigurace zajistí správnou konektivitu na MySQL databázi pro
 <bean id="shibboleth.MySQLDataSource"
     class="org.apache.commons.dbcp.BasicDataSource"
     p:driverClassName="com.mysql.jdbc.Driver"
-    p:url="jdbc:mysql://localhost:3306/shibboleth?autoReconnect=true"
+    p:url="jdbc:mysql://localhost:3306/shibboleth?autoReconnect=true&amp;initialTimeout=3&amp;sessionVariables=wait_timeout=31536000""
     p:username="shibboleth"
     p:password="silne_heslo" />
  
