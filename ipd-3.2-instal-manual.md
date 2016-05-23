@@ -348,7 +348,7 @@ vi /opt/shibboleth-idp/conf/metadata-providers.xml
     maxRefreshDelay="PT15M">
     <MetadataFilter
         xsi:type="SignatureValidation"
-        requireSignedMetadata="true"
+        requireSignedRoot="true"
         certificateFile="%{idp.home}/credentials/metadata.eduid.cz.crt.pem" />
 </MetadataProvider>
 ```
@@ -362,7 +362,7 @@ vi /opt/shibboleth-idp/conf/metadata-providers.xml
     maxRefreshDelay="PT15M">
     <MetadataFilter
         xsi:type="SignatureValidation"
-        requireSignedMetadata="true"
+        requireSignedRoot="true"
         certificateFile="%{idp.home}/credentials/metadata.eduid.cz.crt.pem" />
 </MetadataProvider>
 ```
@@ -376,7 +376,7 @@ vi /opt/shibboleth-idp/conf/metadata-providers.xml
     maxRefreshDelay="PT1H">
     <MetadataFilter
         xsi:type="SignatureValidation"
-        requireSignedMetadata="true"
+        requireSignedRoot="true"
         certificateFile="%{idp.home}/credentials/metadata.eduid.cz.crt.pem" />
 </MetadataProvider>
 ```
