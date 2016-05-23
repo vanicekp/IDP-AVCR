@@ -385,6 +385,30 @@ Veřejný klíč je k dispozici na adrese `https://www.eduid.cz/docs/eduid/metad
 ## attribute-resolver
 V souboru `attribute-resolver.xml` definujeme atributy.
 
+je nutno důsledně definovat `sourceAttributeID=`. Jinak to huhlá do logu.
+
+
+## attribute-filter
+
+Oproti předchozím verzím IDP je jednodužší syntaxe souboru, kromě kratší hlavičky :
+```
+<AttributeFilterPolicyGroup id="ShibbolethFilterPolicy"
+        xmlns="urn:mace:shibboleth:2.0:afp"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="urn:mace:shibboleth:2.0:afp http://shibboleth.net/schema/idp/shibboleth-afp.xsd">
+```
+a zjednodušené hlavičky grup:
+```
+<AttributeFilterPolicy id="eduidcz">
+
+    <PolicyRequirementRule xsi:type="InEntityGroup"
+        groupID="https://eduid.cz/metadata" />
+```
+je nutno soubor zbavit balastu například:
+```
+cat /opt/templates/shibboleth/attribute-filter.xml | sed "s/basic://g" | sed "s/afp://g" 
+```
+
 ### Skripty pro shibboleth 3
 Protože Java 8 změnila engine pro vnořené javascripty a zároveň shibbolet 3 změnil částčně API pro psaní javascriptů, bylo nutné upravit scripty pro odháčkování a `eduPersonEntitlement`.
 
@@ -463,6 +487,47 @@ Importujeme data
 ```
 mysql -u root -p shibboleth < ~/persistentID.sql
 ```
+
+#### Migrace z IDP 3.1.x
+```
+mysqldump shibboleth > shibpid-3.1.2.sql
+```
+změníme strukturu tabulky z:
+```
+CREATE TABLE `shibpid` (
+  `localEntity` text NOT NULL,
+  `peerEntity` text NOT NULL,
+  `principalName` varchar(255) NOT NULL DEFAULT '',
+  `localId` varchar(255) NOT NULL,
+  `persistentId` varchar(36) NOT NULL,
+  `peerProvidedId` varchar(255) DEFAULT NULL,
+  `creationDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deactivationDate` timestamp NULL DEFAULT NULL,
+  KEY `persistentId` (`persistentId`),
+  KEY `persistentId_2` (`persistentId`,`deactivationDate`),
+  KEY `localEntity` (`localEntity`(16),`peerEntity`(16),`localId`),
+  KEY `localEntity_2` (`localEntity`(16),`peerEntity`(16),`localId`,`deactivationDate`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+```
+na:
+```
+CREATE TABLE `shibpid` (
+  `localEntity` varchar(255) NOT NULL,
+  `peerEntity` varchar(255) NOT NULL,
+  `principalName` varchar(255) NOT NULL DEFAULT '',
+  `localId` varchar(255) NOT NULL,
+  `persistentId` varchar(50) NOT NULL,
+  `peerProvidedId` varchar(255) DEFAULT NULL,
+  `creationDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deactivationDate` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (localEntity, peerEntity, persistentId)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+```
+a importujeme
+```
+mysql shibboleth < shibpid-3.2.0.sql
+```
+
 ### /etc/my.cnf
 Do konfiguračního souboru přidáme delší timeout.
 ```
@@ -471,24 +536,34 @@ wait_timeout=31536000
 ```
 
 ### Jetty
-Jetty potřebuje pro správnou funkčnost tyto tři JAR soubory, které je nutné umístit do složky s externími knihovnami `/opt/jetty/lib/ext`: 
+Jetty potřebuje pro správnou funkčnost tyto čtyři JAR soubory, které je nutné umístit do složky s externími knihovnami `/opt/jetty/lib/ext`: 
 
-commons-dbcp-1.4.jar `http://search.maven.org/remotecontent?filepath=commons-dbcp/commons-dbcp/1.4/commons-dbcp-1.4.jar`
+commons-dbcp2-2.1.1.jar `https://search.maven.org/remotecontent?filepath=org/apache/commons/commons-dbcp2/2.1.1/commons-dbcp2-2.1.1.jar`
 
-commons-pool-1.6.jar `http://search.maven.org/remotecontent?filepath=commons-pool/commons-pool/1.6/commons-pool-1.6.jar`
+commons-pool2-2.4.2.jar `https://search.maven.org/remotecontent?filepath=org/apache/commons/commons-pool2/2.4.2/commons-pool2-2.4.2.jar`
+
+commons-logging-api-1.1.jar `https://search.maven.org/remotecontent?filepath=commons-logging/commons-logging-api/1.1/commons-logging-api-1.1.jar`
 
 mysql-connector-java-5.1.36-bin.jar `http://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.36.tar.gz`
+
 
 #### Apache Commons DBCP & Pool
 ```
 cd /opt/src/
-cp commons-dbcp-1.4.jar commons-pool-1.6.jar /opt/jetty/lib/ext/
+cp commons-dbcp2-2.1.1.jar commons-pool2-2.4.2.jar commons-logging-api-1.1.jar /opt/jetty/lib/ext/
 ```
+#####  V případě upgrade z IDP 3.1.x 
+smazat staré jar soubory.
+```
+cd /opt/jetty/lib/ext/
+rm -i commons-dbcp-1.4.jar commons-pool-1.6.jar
+```
+
 #### MySQL Connector/J
 ```
 cd /opt/src/
-tar -xzf mysql-connector-java-5.1.36.tar.gz
-cp mysql-connector-java-5.1.36/mysql-connector-java-5.1.36-bin.jar /opt/jetty/lib/ext/
+tar -xzf mysql-connector-java-5.1.38.tar.gz
+cp mysql-connector-java-5.1.38/mysql-connector-java-5.1.38-bin.jar /opt/jetty/lib/ext/
 ```
 ### Shibboleth IdP
 Do konfiguračního souboru attribute-resolver.xml musíme doplnit podporu pro persistentní identifikátor.
@@ -524,15 +599,11 @@ vi conf/global.xml
 Následující konfigurace zajistí správnou konektivitu na MySQL databázi pro ukládání persistentních identifikátorů.
 ```
 <bean id="shibboleth.MySQLDataSource"
-    class="org.apache.commons.dbcp.BasicDataSource"
+    class="org.apache.commons.dbcp2.BasicDataSource"
     p:driverClassName="com.mysql.jdbc.Driver"
     p:url="jdbc:mysql://localhost:3306/shibboleth?autoReconnect=true&amp;initialTimeout=3&amp;sessionVariables=wait_timeout=31536000"
     p:username="shibboleth"
     p:password="silne_heslo" />
- 
-<bean id="PersistentIdStore"
-    class="net.shibboleth.idp.saml.nameid.impl.JDBCPersistentIdStore"
-    p:dataSource-ref="shibboleth.MySQLDataSource" />
 ```
  V konfiguračním souboru attribute-filter.xml nastavíme vydávání atributu eduPersonTargetedID. 
 ``` 
@@ -550,7 +621,7 @@ vi conf/saml-nameid.properties
 Zde definujeme odkazy na výše definované bean-y, dále atribut, který se bude pro výpočet persistentního identifikátoru používat (uid) a salt použitou pro výpočet (tu jste si již vygenerovali výše).
 ```
 idp.persistentId.generator = shibboleth.StoredPersistentIdGenerator
-idp.persistentId.store = PersistentIdStore
+idp.persistentId.dataSource = shibboleth.MySQLDataSource
 idp.persistentId.sourceAttribute = eduPersonPrincipalName
 idp.persistentId.salt = SALT
 ```
@@ -582,5 +653,7 @@ Poslední nutný konfigurační krok spočívá v přidání knihovny JSTL do Sh
 ```
 cd /opt/shibboleth-idp
 ./bin/build.sh
+chown -R idp:idp /opt/jetty
+chown -R idp:idp /opt/idp/idp*
 /etc/init.d/jetty restart
 ```
