@@ -294,6 +294,8 @@ connect = oid1.eis.cas.cz:3132
 Je nutno  použít verzi stunnelu minimálně 5. Ta z distribuce centos 6 nefunguje.
 Startování stunnelu je v `/etc/rc.local`.
 
+# Vše dál se týká instalace shibbolethu
+
 ## JAAS
 Pro autentifikaci je vzhledem ke komplikovnému schématu nutno použít JAAS. Zdá se, že JETTY má pro každou virtuální instanci zvláštní instanci JAAS, takže není třeba harakiri se změnou názvu přihlašovací procedury. Konfigurace se provede v `conf/authn/password-authn-config.xml`, kde zakomentujeme ladap autentifikaci a povolíme JAAS.
 ```
