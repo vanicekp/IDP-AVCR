@@ -257,14 +257,13 @@ Netřeba žádných změn.
 ## Logování
 V souboru `conf/logback.xml` změníme úroveň logování na `WARN` a `DEBUG`.
 ```
-    <!-- Logs IdP, but not OpenSAML, messages -->
-    <logger name="net.shibboleth.idp" level="WARN"/>
-
-    <!-- Logs OpenSAML, but not IdP, messages -->
-    <logger name="org.opensaml.saml" level="WARN"/>
-
-    <!-- Logs LDAP related messages -->
-    <logger name="org.ldaptive" level="DEBUG"/>
+    <!-- Logging level shortcuts. -->
+    <variable name="idp.loglevel.idp" value="WARN" />
+    <variable name="idp.loglevel.ldap" value="DEBUG" />
+    <variable name="idp.loglevel.messages" value="WARN" />
+    <variable name="idp.loglevel.encryption" value="INFO" />
+    <variable name="idp.loglevel.opensaml" value="WARN" />
+    <variable name="idp.loglevel.props" value="INFO" />
 ```
 
 ## Konfigurace eduPersonTargetedID 
