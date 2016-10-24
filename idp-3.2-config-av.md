@@ -101,6 +101,7 @@ Editujeme:
 Do adresáře `/opt/idp/idp.foo.cas.cz/edit-webapp/images` dáme místo prázdného loga logo pro rozlišení virtuálu při chybových hláškách. V opačném případě nepoznáme, který virtuál vygeneroval chybu, není to na stránce napsané.
 ```
 cp  ~/loga/foo.png edit-webapp/images/dummylogo.png
+chown -R idp:idp .
 ./bin/build.sh
 Installation Directory: [/opt/idp/idp.test.cas.cz]
 ```
@@ -299,6 +300,7 @@ cp /opt/src/jstl-1.2.jar edit-webapp/WEB-INF/lib
 ```
 Přegenerujte JAR Shibbolethu a restartujeme jetty.
 ```
+chown -R idp:idp .
 ./bin/build.sh
 /etc/init.d/jetty restart
 ```
@@ -315,6 +317,7 @@ cp /opt/templates/shibboleth/login.vm views/
 ```
 Přegenerujte JAR Shibbolethu a restartujeme jetty.
 ```
+chown -R idp:idp .
 ./bin/build.sh
 /etc/init.d/jetty restart
 ```
