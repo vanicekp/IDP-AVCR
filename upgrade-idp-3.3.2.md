@@ -17,7 +17,7 @@ cd idp.foo.cas.cz-source
 
 vi webapp/WEB-INF/web.xml
 ```
-Za parametr <display-name> vložíme
+Za parametr `<display-name>` vložíme
 ```
 <context-param>
     <param-name>idp.home</param-name>
