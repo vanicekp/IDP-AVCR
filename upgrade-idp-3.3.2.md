@@ -52,6 +52,7 @@ Je třeba upravit syntaxi tak aby odpovídala novým požadavkům. Ono by to se 
 
 Napřed záloha
 ```
+cd conf
 cp attribute-resolver.xml attribute-resolver.xml.bak
 ```
 #### Úprava má dva kroky. 
