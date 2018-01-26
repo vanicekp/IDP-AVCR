@@ -50,6 +50,10 @@ chown -R idp:idp .
 ### A nakonec úprava souboru `attribute-resolver.xml`
 Je třeba upravit syntaxi tak aby odpovídala novým požadavkům. Ono by to se starou chodilo, ale nová je jednoduší a přehlednější.
 
+Napřed záloha
+```
+cp attribute-resolver.xml attribute-resolver.xml.bak
+```
 #### Úprava má dva kroky. 
 První je úprava hlavičky souboru.
 
@@ -77,7 +81,6 @@ cat attribute-resolver.xml | sed -e "s/resolver://g" | sed -e "s/enc://g" | sed 
 ```
 a nakopíruje se nový konfigurák.
 ```
-cp attribute-resolver.xml attribute-resolver.xml.bak
 cp attribute-resolver.xml.1 attribute-resolver.xml
 ```
 A restartne se jetty
