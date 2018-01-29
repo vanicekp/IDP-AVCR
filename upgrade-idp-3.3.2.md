@@ -1,19 +1,22 @@
 # Postup aktualizace idp.foo.cas.cz na nejnovější verzi  shibboleth-identity-provider-3.3.2
-
+### Nastavíme proměnou
+```
+export FOO=foo
+```
 ### Nejprve zazálohovat stav:
 
 ```
 cd /opt/idp
-tar czvf idp.foo.cas.cz.tar.gz idp.foo.cas.cz/
+tar czvf idp.$FOO.cas.cz.tar.gz idp.$FOO.cas.cz/
 ```
 ### Vytvoření nové distribuce
 ```
 cd /opt/dist
-mv idp.foo.cas.cz-source idp.foo.cas.cz-source.3
+mv idp.$FOO.cas.cz-source idp.$FOO.cas.cz-source.3
 ```
 ```
-cp -r ../src/shibboleth-identity-provider-3.3.2 idp.foo.cas.cz-source
-cd idp.foo.cas.cz-source
+cp -r ../src/shibboleth-identity-provider-3.3.2 idp.$FOO.cas.cz-source
+cd idp.$FOO.cas.cz-source
 
 vi webapp/WEB-INF/web.xml
 ```
@@ -43,7 +46,7 @@ Total time: 23 seconds
 
 Dále upravíme práva:
 ```
-cd /opt/idp/idp.foo.cas.cz
+cd /opt/idp/idp.$FOO.cas.cz
 chown -R idp:idp .
 ```
 
