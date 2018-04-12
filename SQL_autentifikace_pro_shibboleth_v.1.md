@@ -19,5 +19,31 @@ Stahneme z
 https://github.com/tauceti2/jaas-rdbms
 ```
 
-A vytvoříme soubor `tagishauth.jar`
+A vytvoříme soubor `tagishauth.jar` příkazem make. Byla nutná editace makefile, nebyl k dispozici příkaz `jar` ale `gjar`.
+
+Soubor nakopírujeme do 
+```
+cp jaas-rdbms-master/tagishauth.jar /opt/idp/idp.foo.cas.cz/webapp/WEB-INF/lib/
+```
+a přegenerujeme `idp.war`
+```
+./bin/build.sh
+```
+
+v adresáři `conf/authn` vytvoříme nový soubor `jaas.config` s obsahem
+```
+ShibUserPassAuth {
+   com.tagish.auth.DBLogin required debug=true dbDriver="com.mysql.jdbc.Driver"
+       dbURL="jdbc:mysql://localhost:3306/xxxjmenodatabazexxx"
+       dbUser="xxxuserxxx" dbPassword="xxxhesloxxx" userTable="user"
+       userColumn="user" passColumn="pass";
+};
+```
+Po restartu by to mělo chodit.
+
+Pozor bude pak nutne zcela překopat získávání atributů z ldapu.
+
+algorithm="SHA-256
+
+
 
