@@ -43,7 +43,9 @@ Po restartu by to mělo chodit.
 
 Pozor bude pak nutne zcela překopat získávání atributů z ldapu.
 
-algorithm="SHA-256
+#### todo
+
+algorithm="SHA-256" ????
 
 
 
