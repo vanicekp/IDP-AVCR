@@ -47,6 +47,8 @@ Pozor bude pak nutne zcela překopat získávání atributů z ldapu.
 
 algorithm="SHA-256" ????
 
+https://www.eduid.cz/cs/tech/idp/shibboleth/mysqlauth
+
 
 ## Konfigurace čtení atributů z mysql databáze vzorový příklad.
 ### Tabulka v databázi
