@@ -48,4 +48,46 @@ Pozor bude pak nutne zcela překopat získávání atributů z ldapu.
 algorithm="SHA-256" ????
 
 
+## Konfigurace čtení atributů z mysql databáze vzorový příklad.
+### Tabulka v databázi
+```
+mysql> show fields from  tel;
++-------+--------------+------+-----+---------+-------+
+| Field | Type         | Null | Key | Default | Extra |
++-------+--------------+------+-----+---------+-------+
+| user  | varchar(255) | YES  |     | NULL    |       |
+| tel   | varchar(255) | YES  |     | NULL    |       |
++-------+--------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+```
+
+### Konfigurace Data connectoru
+```
+<!-- MySQL Data Connector -->
+<DataConnector id="mySQL"
+    xsi:type="RelationalDatabase">
+    <ApplicationManagedConnection
+        jdbcDriver="com.mysql.jdbc.Driver"
+        jdbcURL="jdbc:mysql://localhost:3306/shibboleth"
+        jdbcUserName="user"
+        jdbcPassword="heslo"/>
+
+        <QueryTemplate>
+            <![CDATA[
+                SELECT * FROM tel WHERE user='$requestContext.principalName'
+            ]]>
+        </QueryTemplate>
+
+        <Column columnName="tel" attributeID="telephoneNumber" />
+```
+### Konfigurace atributu
+```
+    <AttributeDefinition xsi:type="Simple" id="telephoneNumber" sourceAttributeID="telephoneNumber">
+        <Dependency ref="mySQL" />
+        <AttributeEncoder xsi:type="SAML1String" name="urn:mace:dir:attribute-def:telephoneNumber" encodeType="false" />
+        <AttributeEncoder xsi:type="SAML2String" name="urn:oid:2.5.4.20" friendlyName="telephoneNumber" encodeType="false" />
+    </AttributeDefinition>
+```
+
+
 
