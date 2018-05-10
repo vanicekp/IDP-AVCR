@@ -265,6 +265,13 @@ Nyní zbývá nastavit vlastnická práva na Jetty uživateli idp ze skupiny idp
 chown -R idp:idp /opt/jetty/ /opt/jetty-distribution*/
 /etc/init.d/jetty start
 ```
+#### ulimit
+V souboru `/etc/security/limits.conf`, přidán řádek 
+```
+*               -    nofile           8192
+```
+A pak reboot.
+
 #### MYSQL
 Pro Provoz mysql je třeba ještě nakopírovat knihovny:
 
