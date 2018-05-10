@@ -182,7 +182,7 @@ Vaše hesla budou samozřejmě jiná. Ta níže uvedená jsou zde jen pro ilustr
 jetty.sslContext.keyStorePassword=OBF:1pifri71kjq1fm1ugw11b1kk01uf1w8f1u61jr1w9b1a31kmm11b1uu1lbw1mw1ri71pjr
 jetty.sslContext.keyManagerPassword=OBF:1yy1jn919k1rt1j01j61v2htvl1j41saj1sarjrm1th1v1xj8x1jrq1oph1v921jk91owk
 jetty.sslContext.trustStorePassword=OBF:1pifri71kjq1fm1ugw11b1kk01uf1w8f1u61jr1w9b1a31kmm11b1uu1lbw1mw1ri71pjr
-````
+```
 
 Výše uvedená hesla zadáme do nového konfiguračního souboru start.d/ssl.ini.
 ```
