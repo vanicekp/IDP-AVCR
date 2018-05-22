@@ -15,7 +15,7 @@ mkdir /opt/dist
 ```
 ```
 cd /opt/dist
-cp -r /opt/src/shibboleth-identity-provider-3.2.1 idp.foo.cas.cz-source
+cp -r /opt/src/shibboleth-identity-provider-3.3.3 idp.foo.cas.cz-source
 ```
 #### Změna idp.home
 V souboru `idp.foo.cas.cz-source/webapp/WEB-INF/web.xml` musíme doplnit definici proměnné `idp.home`, jinak bude instalace předpokládat umístění v defaultním adresáři `/opt/shibboleth-idp`.
