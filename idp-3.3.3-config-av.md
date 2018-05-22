@@ -308,9 +308,9 @@ chown -R idp:idp .
 Logo umístíme do adresáře `edit-webapp/images`, optimální výška loga je 100px. 
 Soubory se "zprávami" umístíme z matrice do adresáře `messages`.
 ```
-cp /opt/templates/shibboleth/messages/* messages/
+cp /opt/templates/shibboleth/messages/messages* messages/
 ```
-V souborech `error-messages.properties` a `error-messages_cs.properties` doplníme správné `NAME` (2x) a `LOGO`.
+V souborech `messages.properties` a `messages_cs.properties` doplníme správné `NAME` (2x) a `LOGO`.
 Nahradíme logovací stánku upravenou o vložený text.
 ```
 cp /opt/templates/shibboleth/login.vm views/
