@@ -290,8 +290,10 @@ V metadatech IdP je potřeba zadat, že IdP podporuje persistentní identifikát
 ```
 vi metadata/idp-metadata.xml
 ```
-Přidejte tedy do elementu `<IDPSSODescriptor>` následující řádek ke zbývajícím dvěma elementům `<NameIDFormat>`.
+Přidejte tedy do elementu `<IDPSSODescriptor>` následující řádky. 
 ```
+<NameIDFormat>urn:mace:shibboleth:1.0:nameIdentifier</NameIDFormat>
+<NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
 <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>
 ```
 Přidáme knihovnu JSTL do shibbolethu.
