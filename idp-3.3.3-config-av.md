@@ -307,7 +307,7 @@ chown -R idp:idp .
 /etc/init.d/jetty restart
 ```
 ## Perzonifikace login stránky a log a chybových hlášek
-Logo umístíme do adresáře `edit-webapp/images`, optimální výška loga je 100px. 
+Logo umístíme do adresáře `edit-webapp/images`, optimální výška loga je 100px.
 Soubory se "zprávami" umístíme z matrice do adresáře `messages`.
 ```
 cp /opt/templates/shibboleth/messages/messages* messages/
@@ -346,6 +346,8 @@ Do `IDPSSODescriptor` extension vložíme informace o ústavu a logách.
                  <mdui:Logo height="XX" width="XX">https://gedeon.cas.cz/loga/logo-foo-xx.png</mdui:Logo>
            </mdui:UIInfo>
 ```
+Loga jsou v adresáři `/opt/jetty/webapps/root/loga/`
+
 K dvěma řádkům `NameIDFormat` přidáme třetí řádek pro perzistentní ID.
 ```
         <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>
