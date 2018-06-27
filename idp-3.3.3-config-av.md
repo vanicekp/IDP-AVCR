@@ -348,7 +348,7 @@ Do `IDPSSODescriptor` extension vložíme informace o ústavu a logách.
 ```
 Loga jsou v adresáři `/opt/jetty/webapps/root/loga/`
 
-K dvěma řádkům `NameIDFormat` přidáme třetí řádek pro perzistentní ID.
+K dvěma řádkům `NameIDFormat` přidáme třetí řádek pro perzistentní ID. Pokud jsme to už neudělali dříve.
 ```
         <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>
 ```
