@@ -259,12 +259,18 @@ Netřeba žádných změn.
 V souboru `conf/logback.xml` změníme úroveň logování na `WARN` a `DEBUG`.
 ```
     <!-- Logging level shortcuts. -->
-    <variable name="idp.loglevel.idp" value="WARN" />
-    <variable name="idp.loglevel.ldap" value="DEBUG" />
-    <variable name="idp.loglevel.messages" value="WARN" />
-    <variable name="idp.loglevel.encryption" value="INFO" />
-    <variable name="idp.loglevel.opensaml" value="WARN" />
-    <variable name="idp.loglevel.props" value="INFO" />
+    <variable name="idp.loglevel.idp" value="${idp.loglevel.idp:-WARN}" />
+    <variable name="idp.loglevel.ldap" value="${idp.loglevel.ldap:-DEBUG}" />
+    <variable name="idp.loglevel.messages" value="${idp.loglevel.messages:-WARN}" />
+    <variable name="idp.loglevel.encryption" value="${idp.loglevel.encryption:-INFO}" />
+    <variable name="idp.loglevel.opensaml" value="${idp.loglevel.opensaml:-WARN}" />
+    <variable name="idp.loglevel.props" value="${idp.loglevel.props:-INFO}" />
+    <variable name="idp.loglevel.httpclient" value="${idp.loglevel.httpclient:-INFO}" />
+```
+## idp.cookie.secure 
+V souboru `conf/idp.properties` je třeba upravit
+```
+idp.cookie.secure = true
 ```
 
 ## Konfigurace eduPersonTargetedID 
