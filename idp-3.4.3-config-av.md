@@ -296,7 +296,14 @@ V metadatech IdP je potřeba zadat, že IdP podporuje persistentní identifikát
 ```
 vi metadata/idp-metadata.xml
 ```
-Přidejte tedy do elementu `<IDPSSODescriptor>` následující řádky. 
+Přidejte tedy do elementu `<IDPSSODescriptor>` následující řádky.  Patří to před:
+```
+        <SingleSignOnService Binding="urn:mace:shibboleth:1.0:profiles:AuthnRequest" Location="https://idp.usd.cas.cz/idp/profile/Shibboleth/SSO"/>
+        <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" req-attr:supportsRequestedAttributes="true" Location="https://idp.usd.cas.cz/idp/profile/SAML2/POST/SSO"/>
+        <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST-SimpleSign" req-attr:supportsRequestedAttributes="true" Location="https://idp.usd.cas.cz/idp/profile/SAML2/POST-SimpleSign/SSO"/>
+        <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" req-attr:supportsRequestedAttributes="true" Location="https://idp.usd.cas.cz/idp/profile/SAML2/Redirect/SSO"/>
+
+```       
 ```
 <NameIDFormat>urn:mace:shibboleth:1.0:nameIdentifier</NameIDFormat>
 <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
@@ -354,8 +361,18 @@ Do `IDPSSODescriptor` extension vložíme informace o ústavu a logách.
 ```
 Loga jsou v adresáři `/opt/jetty/webapps/root/loga/`
 
-K dvěma řádkům `NameIDFormat` přidáme třetí řádek pro perzistentní ID. Pokud jsme to už neudělali dříve.
+Přidáme informace o identifikatorech `NameIDFormat`  Pokud jsme to už neudělali dříve. Patří to před:
 ```
+        <SingleSignOnService Binding="urn:mace:shibboleth:1.0:profiles:AuthnRequest" Location="https://idp.usd.cas.cz/idp/profile/Shibboleth/SSO"/>
+        <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" req-attr:supportsRequestedAttributes="true" Location="https://idp.usd.cas.cz/idp/profile/SAML2/POST/SSO"/>
+        <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST-SimpleSign" req-attr:supportsRequestedAttributes="true" Location="https://idp.usd.cas.cz/idp/profile/SAML2/POST-SimpleSign/SSO"/>
+        <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" req-attr:supportsRequestedAttributes="true" Location="https://idp.usd.cas.cz/idp/profile/SAML2/Redirect/SSO"/>
+
+```
+
+```
+	<NameIDFormat>urn:mace:shibboleth:1.0:nameIdentifier</NameIDFormat>
+	<NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
         <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>
 ```
 Skoro na konec, před závěrečný tag `</EntityDescriptor>`, vložíme informace o ústavu a technickém kontaktu.
@@ -372,6 +389,6 @@ Skoro na konec, před závěrečný tag `</EntityDescriptor>`, vložíme informa
     <ContactPerson contactType="technical">
       <GivenName>Petr</GivenName>
       <SurName>Vaníček</SurName>
-      <EmailAddress>vanicekp@utia.cas.cz</EmailAddress>
+      <EmailAddress>mailto:vanicekp@utia.cas.cz</EmailAddress>
     </ContactPerson>
 ```
