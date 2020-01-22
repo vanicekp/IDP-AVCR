@@ -1,4 +1,4 @@
-# Instalace a konfigurace Jetty pro AV ČR verze  CENTOS 8 pro ASUCH Win AD
+# Instalace a konfigurace Jetty a mysql pro AV ČR verze CENTOS 8 pro ASUCH Win AD
 ## Instalace CENTOS
 ### Instalace minimal 4G RAM  4 CPU
 Instalace potřebných součástí
@@ -161,6 +161,52 @@ mysql-connector-java-5.1.39-bin.jar
 
 ## Mělo by fungovat `/etc/init.d/jetty start`
 
+# Mysql
+## Konfigurace serveru
+Start serveru
+```
+systemctl start mariadb
+systemctl enable mariadb
+```
+Konfigurace root hesla
+```
+mysql_secure_installation
+```
+## Konfigurace databáze
+```
+mysql -u root -p
+```
+Založení databáze
+```
+SET NAMES 'utf8';
+SET CHARACTER SET utf8;
+CHARSET utf8;
+CREATE DATABASE IF NOT EXISTS shibboleth CHARACTER SET=utf8;
+USE shibboleth;
+CREATE TABLE IF NOT EXISTS `shibpid` (
+  `localEntity` VARCHAR(255) NOT NULL,
+  `peerEntity` VARCHAR(255) NOT NULL,
+  `principalName` VARCHAR(255) NOT NULL DEFAULT '',
+  `localId` VARCHAR(255) NOT NULL,
+  `persistentId` VARCHAR(50) NOT NULL,
+  `peerProvidedId` VARCHAR(255) DEFAULT NULL,
+  `creationDate` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deactivationDate` TIMESTAMP NULL DEFAULT NULL,
+  PRIMARY KEY (localEntity, peerEntity, persistentId)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+```
+Vytvoření uživatele shibboleth, heslo se dá vygenerovat třeba `openssl rand -hex 20`
+```
+GRANT ALL PRIVILEGES ON shibboleth.*
+      TO 'shibboleth'@'localhost'
+      IDENTIFIED BY 'xxxxxxxxxxxxxxxxxxxxxxxxxxx';
+FLUSH PRIVILEGE
+```
+Test se dá udělat třeba `mysql -u shibboleth -p shibboleth`.
+Poslední věc je přenos dat z minulé instalace. Uloženo pomocí mysqldump.
+```
+mysql -p -u root shibboleth < ~/shibbolethdb.sql
+```
 
 
 
