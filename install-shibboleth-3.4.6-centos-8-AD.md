@@ -1,6 +1,8 @@
 # Instalace a konfigurace Jetty a mysql pro AV ČR verze CENTOS 8 pro ASUCH Win AD
 ## Instalace CENTOS
-### Instalace minimal 4G RAM  4 CPU
+#### Instalace minimal 4G RAM  4 CPU
+Zákaz selinuxu v souboru `/etc/sysconfig/selinux`
+
 Instalace potřebných součástí
 ```
 yum install openldap-clients
