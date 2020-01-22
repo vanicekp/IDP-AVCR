@@ -7,15 +7,11 @@ http://shibboleth.net/downloads/identity-provider/
 #### příkazy zadané do terminálu:
 ``` 
 cd /opt/src
-tar -xzf src/shibboleth-identity-provider-3.4.3.tar.gz
+tar -xzf src/shibboleth-identity-provider-3.4.6.tar.gz
 ```
 #### Příprava instalace
 ```
-mkdir /opt/dist
-```
-```
-cd /opt/dist
-cp -r /opt/src/shibboleth-identity-provider-3.4.3 idp.foo.cas.cz-source
+mv -r shibboleth-identity-provider-3.4.6 idp.foo.cas.cz-source
 ```
 #### Změna idp.home
 V souboru `idp.foo.cas.cz-source/webapp/WEB-INF/web.xml` musíme doplnit definici proměnné `idp.home`, jinak bude instalace předpokládat umístění v defaultním adresáři `/opt/shibboleth-idp`.
@@ -98,12 +94,12 @@ Editujeme:
 </entry>
 ```
 #### Perzonifikace loga pro identifikaci virtuálu
-Do adresáře `/opt/idp/idp.foo.cas.cz/edit-webapp/images` dáme místo prázdného loga logo pro rozlišení virtuálu při chybových hláškách. V opačném případě nepoznáme, který virtuál vygeneroval chybu, není to na stránce napsané.
+Do adresáře `/opt/idp/idp.foo.cas.cz/edit-webapp/images` dáme místo prázdného loga logo pro rozlišení virtuálu při chybových hláškách. V opačném případě nepoznáme, který virtuál vygeneroval chybu, není to na stránce napsané. 
 ```
 cp  ~/loga/foo.png edit-webapp/images/dummylogo.png
 chown -R idp:idp .
 ./bin/build.sh
-Installation Directory: [/opt/idp/idp.test.cas.cz]
+Installation Directory: [/opt/idp/idp.foo.cas.cz]
 ```
 
 ## Konfigurace Jetty virtuálu
@@ -192,42 +188,76 @@ last reload attempt: 2016-04-19T07:06:42Z
 
 Můžete také zkusit ze svého počítače přístoupit na URL adresu s IdP: `https://idp.foo.cas.cz/idp`. Nicméně neuvidíte nic zajímavého. 
 
-## JAAS autentifikace
-Pro autentifikaci je vzhledem ke komplikovanému schématu nutno použít JAAS. Zdá se, že JETTY má pro každou virtuální instanci zvláštní instanci JAAS, takže není třeba harakiri se změnou názvu přihlašovací procedury. Konfigurace se provede v `conf/authn/password-authn-config.xml`, kde zakomentujeme ladap autentifikaci a povolíme JAAS.
-```
-    <import resource="jaas-authn-config.xml" />
-    <!-- <import resource="krb5-authn-config.xml" /> -->
-    <!-- <import resource="ldap-authn-config.xml" /> -->
-```
-Dále provedeme konfiguraci JAAS v souboru `conf/authn/jaas.config`. `{ID-foo-number}` je číslo ústavu.
-```
-ShibUserPassAuth {
-   org.ldaptive.jaas.LdapLoginModule required
-      ldapUrl="ldap://localhost:50000"
-      baseDn="cn=Users,dc=eis,dc=cas,dc=cz"
-      userFilter="(&(cn={user})(employeenumber={ID-foo-number}*)(orclisenabled=ENABLED))";
-};
-```
-V případě komplikovaných ústavů s více čísly je obsah `conf/authn/jaas.config` následující:
-```
-ShibUserPassAuth {
-      org.ldaptive.jaas.LdapLoginModule sufficient
-      ldapUrl="ldap://localhost:50000"
-      baseDn="cn=Users,dc=eis,dc=cas,dc=cz"
-      userFilter="(&(cn={user})(employeenumber={ID-foo-number1}*)(orclisenabled=ENABLED))";
+## Konfigurace autentifikace
+Konfigurace se dělá v souboru `conf/ldap.properties` a obsahuje informace o tom jak autentifikovat proti LDAPu, konfiguraci  baseDN a informaci o uživateli pro prohledávaní LDAPu pro získávání atributů. U atributu `idp.authn.LDAP.baseDN` doplnit cestu podle ústavu. U atributu `idp.authn.LDAP.bindDNCredential` je třeba doplnit heslo pro ldap_eduid. Pro vyřešení požadavku nezadávat k uživatelskému jménu postfix s domenou je u atributů `idp.authn.LDAP.dnFormat` a `idp.attribute.resolver.LDAP.searchFilter` přidán postfix. Další věc je volba atributu v LDAPu pro porovnání a vyhledávání. `userPrincipalName`. Soubor je připraven až na DN ústavu `/opt/templates/shibboleth/ldap.properties`.
 
-   org.ldaptive.jaas.LdapLoginModule sufficient
-      ldapUrl="ldap://localhost:50000"
-      baseDn="cn=Users,dc=eis,dc=cas,dc=cz"
-      userFilter="(&(cn={user})(employeenumber={ID-foo-number2}*)(orclisenabled=ENABLED))";
-
-   org.ldaptive.jaas.LdapLoginModule sufficient
-      ldapUrl="ldap://localhost:50000"
-      baseDn="cn=Users,dc=eis,dc=cas,dc=cz"
-      userFilter="(&(cn={user})(employeenumber={ID-foo-number3}*)(orclisenabled=ENABLED))";
-
-};
 ```
+# LDAP authentication configuration, see authn/ldap-authn-config.xml
+# Note, this doesn't apply to the use of JAAS
+
+## Authenticator strategy, either anonSearchAuthenticator, bindSearchAuthenticator, directAuthenticator, adAuthenticator
+idp.authn.LDAP.authenticator                   = adAuthenticator
+
+## Connection properties ##
+idp.authn.LDAP.ldapURL                          = ldap://dc2.asuch.cas.cz:389
+idp.authn.LDAP.useStartTLS                     =  false
+idp.authn.LDAP.useSSL                          = false
+# Time in milliseconds that connects will block
+#idp.authn.LDAP.connectTimeout                  = PT3S
+# Time in milliseconds to wait for responses
+#idp.authn.LDAP.responseTimeout                 = PT3S
+
+## SSL configuration, either jvmTrust, certificateTrust, or keyStoreTrust
+#idp.authn.LDAP.sslConfig                       = certificateTrust
+## If using certificateTrust above, set to the trusted certificate's path
+idp.authn.LDAP.trustCertificates                = %{idp.home}/credentials/ldap-server.crt
+## If using keyStoreTrust above, set to the truststore path
+idp.authn.LDAP.trustStore                       = %{idp.home}/credentials/ldap-server.truststore
+
+## Return attributes during authentication
+idp.authn.LDAP.returnAttributes                 = passwordExpirationTime,loginGraceRemaining
+
+## DN resolution properties ##
+
+# Search DN resolution, used by anonSearchAuthenticator, bindSearchAuthenticator
+# for AD: CN=Users,DC=example,DC=org
+idp.authn.LDAP.baseDN                           = OU=Users,OU=XXXX,DC=asuch,DC=cas,DC=cz
+#idp.authn.LDAP.subtreeSearch                   = true
+idp.authn.LDAP.userFilter                       = (userPrincipalName={uid})
+# bind search configuration
+# for AD: idp.authn.LDAP.bindDN=adminuser@domain.com
+idp.authn.LDAP.bindDN                           = CN=ldap_eduid,CN=Users,DC=asuch,DC=cas,DC=cz
+idp.authn.LDAP.bindDNCredential                 = xxxxxxxxxxxxxxxx
+
+# Format DN resolution, used by directAuthenticator, adAuthenticator
+# for AD use idp.authn.LDAP.dnFormat=%s@domain.com
+idp.authn.LDAP.dnFormat                         = %s@asuch.cas.cz
+
+# LDAP attribute configuration, see attribute-resolver.xml
+# Note, this likely won't apply to the use of legacy V2 resolver configurations
+idp.attribute.resolver.LDAP.ldapURL             = %{idp.authn.LDAP.ldapURL}
+idp.attribute.resolver.LDAP.connectTimeout      = %{idp.authn.LDAP.connectTimeout:PT3S}
+idp.attribute.resolver.LDAP.responseTimeout     = %{idp.authn.LDAP.responseTimeout:PT3S}
+idp.attribute.resolver.LDAP.baseDN              = %{idp.authn.LDAP.baseDN:undefined}
+idp.attribute.resolver.LDAP.bindDN              = %{idp.authn.LDAP.bindDN:undefined}
+idp.attribute.resolver.LDAP.bindDNCredential    = %{idp.authn.LDAP.bindDNCredential:undefined}
+idp.attribute.resolver.LDAP.useStartTLS         = %{idp.authn.LDAP.useStartTLS:true}
+idp.attribute.resolver.LDAP.trustCertificates   = %{idp.authn.LDAP.trustCertificates:undefined}
+idp.attribute.resolver.LDAP.searchFilter        = (userPrincipalName=$resolutionContext.principal@asuch.cas.cz)
+
+# LDAP pool configuration, used for both authn and DN resolution
+#idp.pool.LDAP.minSize                          = 3
+#idp.pool.LDAP.maxSize                          = 10
+#idp.pool.LDAP.validateOnCheckout               = false
+#idp.pool.LDAP.validatePeriodically             = true
+#idp.pool.LDAP.validatePeriod                   = PT5M
+#idp.pool.LDAP.prunePeriod                      = PT5M
+#idp.pool.LDAP.idleTime                         = PT10M
+#idp.pool.LDAP.blockWaitTime                    = PT3S
+#idp.pool.LDAP.failFastInitialize               = false
+idp.ldaptive.provider            = org.ldaptive.provider.unboundid.UnboundIDProvider
+```
+
 
 ## metadata-providers.xml
 V souboru `metadata-providers.xml` je definice zdrojů metadat pro IDP. Nastavení provedeme zkopírováním z templates. Kopírujeme soubor `metadata-provaiders.xml` a podpisový klíč `metadata.eduid.cz.crt.pem`.
@@ -271,6 +301,7 @@ V souboru `conf/logback.xml` změníme úroveň logování na `WARN` a `DEBUG`.
 V souboru `conf/idp.properties` je třeba upravit
 ```
 idp.cookie.secure = true
+idp.consent.StorageService = shibboleth.JPAStorageService
 ```
 
 ## Konfigurace eduPersonTargetedID 
@@ -308,10 +339,6 @@ Přidejte tedy do elementu `<IDPSSODescriptor>` následující řádky.  Patří
 <NameIDFormat>urn:mace:shibboleth:1.0:nameIdentifier</NameIDFormat>
 <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
 <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>
-```
-Přidáme knihovnu JSTL do shibbolethu.
-```
-cp /opt/src/jstl-1.2.jar edit-webapp/WEB-INF/lib
 ```
 Přegenerujte JAR Shibbolethu a restartujeme jetty.
 ```
