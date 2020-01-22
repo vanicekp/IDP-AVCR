@@ -1,57 +1,26 @@
-# Instalace a konfigurace Shibboleth a Jetty pro AV ČR
-## Oracle JDK - upgrade
-Ačkoliv je v linuxových distribucích mnohdy možnost nainstalovat Javu pomocí balíčkovacího systému dané distribuce, např. OpenJDK, silně doporučujeme to, co Shibboleth konzorcium. Použijeme tedy Javu od Oracle. Čas od času se objeví nějaký problém způsobený použitím např. OpenJDK. Budeme-li žádat o podporu, může se stát, že budeme vyzváni, abychom problém reprodukovali s využitím Javy od společnosti Oracle.
-
-Po stažení Oracle JDK umístíme archiv do adresáře `/opt/src` a pomocí následujících příkazů JDK nainstalujeme:
+# Instalace a konfigurace Shibboleth a Jetty pro AV ČR verze  CENTOS 8 pro ASUCH Win AD
+## Instalace CENTOS
+### Instalace minimal 4G RAM  4 CPU
+Instalace potřebných součástí
 ```
-http://www.oracle.com/technetwork/java/javase/downloads/index.html
+yum install openldap-clients
+yum install mariadb mariadb-server
+yum -y install wget
+wget http://35.244.242.82/yum/java/el7/x86_64/jdk-8u231-linux-x64.rpm
+yum localinstall jdk-8u231-linux-x64.rpm
+yum install unzip jce_policy-8.zip
+yum install unzip
+yum install firewall-config
+yum install xauth
+yum install net-tools
+yum update
 ```
-#### Rozbalení a instalace Oracle JDK
+Do `.bash_profile` přidáme
 ```
-cd /opt
-tar -xzvf src/jdk-8u91-linux-x64.tar.gz 
-alternatives --install /usr/bin/java java /opt/jdk1.8.0_91/bin/java 120                                                                                                                                                            
-alternatives --install /usr/bin/javac javac /opt/jdk1.8.0_91/bin/javac 120                                                                                                                                                         
-sed -i.bak 's%export JAVA_HOME=/opt/jdk1.8.0_77%export JAVA_HOME=/opt/jdk1.8.0_91%' ~/.bashrc                                                                                                                                      
-source ~/.bashrc                                                                                                                                                                                                                   
-```
-Odstranění starých java instalaci
-```
-alternatives --remove java /opt/jdk1.8.0_77/bin/java
-alternatives --remove javac /opt/jdk1.8.0_77/bin/javac
-alternatives --remove java /usr/lib/jvm/jre-1.7.0-openjdk.x86_64/bin/java
-alternatives --remove java /usr/lib/jvm/jre-1.6.0-openjdk.x86_64/bin/java
-alternatives --remove java /usr/lib/jvm/jre-1.5.0-gcj/bin/java
+export JAVA_HOME=/usr/java/jdk1.8.0_231-amd64
 ```
 
-O korektním nastavení právě nainstalovaného Oracle JDK se můžeme přesvědčit následovně.
 
-#### Příkaz pro zobrazení aktuálně využívané verze Javy
-```
-alternatives --display java
-```
-
-Můžeme se také přesvědčit zavoláním příkazu java.
-
-#### Příkaz pro zobrazení aktuálně využívané verze Javy
-```java -version```
-
-#### Výstup příkazu pro zobrazení aktuálně využívané verze Javy
-```
-java version "1.8.0_91"
-Java(TM) SE Runtime Environment (build 1.8.0_91-b14)
-Java HotSpot(TM) 64-Bit Server VM (build 25.91-b14, mixed mode)
-```
-Zda máme správně nastavenou proměnnou prostřední $JAVA_HOME zjistíme, pokud znovu načteme konfigurační soubor interpretu BASH a vyžádáme si hodnotu proměnné $JAVA_HOME.
-
-#### Příkaz pro zobrazení hodnoty proměnné $JAVA_HOME
-```
-source ~/.bashrc && echo $JAVA_HOME
-```
-#### Výstup příkazu pro zobrazení hodnoty proměnné $JAVA_HOME
-```
-/opt/jdk1.8.0_91
-```
 ### Java Cryptography Extension (Unlimited Strength Jurisdiction Policy Files)
 Po nainstalování Oracle JDK je ještě potřeba doinstalovat tzv. JCE US (Java Cryptography Extension Unlimited Strength), které zajistí možnost využít silnější šifrování.
 
@@ -77,12 +46,8 @@ Adresář s rozbaleným rozšířením JCE US můžeme nyní smazat.
 ```
 rm -rf UnlimitedJCEPolicyJDK8/
 ```
-### Odstranění staré Javy (8u77)
-```
-rm -rf /opt/jdk1.8.0_77/
-```
 
-## Jetty - upgrade
+## Jetty 
 Založíme uživatele idp.
 ```
 adduser idp                                                                                                         
