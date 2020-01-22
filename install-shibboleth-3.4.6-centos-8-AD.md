@@ -1,4 +1,4 @@
-# Instalace a konfigurace Shibboleth a Jetty pro AV ČR verze  CENTOS 8 pro ASUCH Win AD
+# Instalace a konfigurace Jetty pro AV ČR verze  CENTOS 8 pro ASUCH Win AD
 ## Instalace CENTOS
 ### Instalace minimal 4G RAM  4 CPU
 Instalace potřebných součástí
