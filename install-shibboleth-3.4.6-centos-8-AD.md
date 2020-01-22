@@ -78,6 +78,7 @@ cd ~
 Vytvoření keystore
 ```
 openssl rsa -in idp.asuch.serverkey.pem -out idp.asuch.serverkey1.pem -des
+cat idp.asuch.cert.pem chain_TERENA_SSL_CA_3.pem >> jetty-cert.txt
 openssl pkcs12 -export -inkey idp.asuch.serverkey1.pem -in jetty-cert.txt -out jetty-cert.pkcs12
 /usr/java/jdk1.8.0_231-amd64/bin/keytool  -importkeystore -srckeystore jetty-cert.pkcs12 -srcstoretype PKCS12 -destkeystore keystore
 ```
