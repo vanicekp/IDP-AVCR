@@ -10,7 +10,6 @@ yum install mariadb mariadb-server
 yum -y install wget
 wget http://35.244.242.82/yum/java/el7/x86_64/jdk-8u231-linux-x64.rpm
 yum localinstall jdk-8u231-linux-x64.rpm
-yum install unzip jce_policy-8.zip
 yum install unzip
 yum install firewall-config
 yum install xauth
@@ -21,7 +20,14 @@ Do `.bash_profile` přidáme
 ```
 export JAVA_HOME=/usr/java/jdk1.8.0_231-amd64
 ```
+A nebo se ddá použít OpenJDK
+```
+yum install java-1.8.0-openjdk
 
+export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.232.b09-2.el8_1.x86_64/jre
+
+```
+Pak není třeba JCE.
 
 ### Java Cryptography Extension (Unlimited Strength Jurisdiction Policy Files)
 Po nainstalování Oracle JDK je ještě potřeba doinstalovat tzv. JCE US (Java Cryptography Extension Unlimited Strength), které zajistí možnost využít silnější šifrování.
@@ -58,8 +64,8 @@ Dále se jetty instaluje následně:
 
 ```
 wget https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-distribution/9.4.24.v20191120/jetty-distribution-9.4.24.v20191120.tar.gz
-tar -xzvf jetty-distribution-9.4.24.v20191120.tar.gz
 mkdir /opt
+cd /opt/
 tar -xzf ~/jetty-distribution-9.4.24.v20191120.tar.gz
 chown -R idp:idp jetty-distribution-9.4.24.v20191120/
 ln -snf /opt/jetty-distribution-9.4.24.v20191120/bin/jetty.sh /etc/init.d/jetty
@@ -69,7 +75,8 @@ echo "JETTY_USER=idp" >> /etc/default/jetty
 echo "JETTY_RUN=/opt/run" >> /etc/default/jetty
 mkdir /opt/run
 chown idp /opt/run
-mdir /opt/jetty
+mkdir /opt/jetty
+chown idp /opt/jetty
 chkconfig --add jetty
 cd /opt/jetty
 su idp
