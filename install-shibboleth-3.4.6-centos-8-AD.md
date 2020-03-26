@@ -80,7 +80,7 @@ chown idp /opt/jetty
 chkconfig --add jetty
 cd /opt/jetty
 su idp
-java -jar /opt/jetty-distribution-9.4.24.v20191120/start.jar    --create-startd --add-to-start=annotations,deploy,ext,http,http2,https,jsp,jstl,plus,requestlog,resources,rewrite,server,servlets,ssl
+java -jar /opt/jetty-distribution-9.4.24.v20191120/start.jar    --create-startd --add-to-start=annotations,deploy,ext,http,http2,https,jsp,jstl,plus,requestlog,resources,rewrite,server,servlets,ssl,logging-jetty,console-capture
 exit
 cd ~
 ```
