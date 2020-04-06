@@ -37,3 +37,8 @@ time /etc/init.d/jetty restart
 
 ### Úpravy pro omezení chybových hlášek
 #### idp.properties
+```
+vi conf/idp.properties
+```
+Změna položky `idp.cookie.secure =  true`
+
