@@ -25,3 +25,15 @@ Source (Distribution) Directory: [/opt/dist/idp.foo.cas.cz-source]
 Installation Directory: [/opt/shibboleth-idp]
 /opt/idp/idp.foo.cas.cz
 ```
+#### Změna vlastníka adresáře
+```
+cd /opt/idp/idp.foo.cas.cz
+chown -R idp:idp .
+```
+#### Restart a mělo by to naběhnout
+```
+time /etc/init.d/jetty restart
+```
+
+### Úpravy pro omezení chybových hlášek
+#### idp.properties
