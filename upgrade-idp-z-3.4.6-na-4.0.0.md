@@ -1,4 +1,4 @@
-#Přenos stávající instalace  IdP z Centos 6 na 8 a upgrade 
+# Přenos stávající instalace  IdP z Centos 6 na 8 a upgrade 
 
 Je nutné mít instalaci ve veryi IdP 3.4.6 která při restartu negeneruje žádná varování v logu IdP.
 
