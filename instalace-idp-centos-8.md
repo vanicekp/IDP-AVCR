@@ -162,6 +162,8 @@ a
 systemctl enable stunnel
 systemctl start stunnel
 ```
+Možno otestovat `ldapsearch -H ldap://localhost:50000 -b 'cn=Users,dc=eis,dc=cas,dc=cz' -D x=null '(uid=malinp01)'
+`
 # Mysql
 ## Konfigurace serveru
 Start serveru
