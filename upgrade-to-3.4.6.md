@@ -236,3 +236,6 @@ Pro složitost a množství změn je lepší nahradit soubor novým z matrice a 
     <InputAttributeDefinition ref="eduPersonPrincipalName" />
 </DataConnector>
 ```
+
+#### attribute-filter.xml
+Nahradit novým z matrice.
