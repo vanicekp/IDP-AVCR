@@ -239,3 +239,9 @@ Pro složitost a množství změn je lepší nahradit soubor novým z matrice a 
 
 #### attribute-filter.xml
 Nahradit novým z matrice.
+
+####  c14n/subject-c14n.xml
+V souboru se zakomentuje řádek:
+```
+<ref bean="c14n/LegacyPrincipalConnector" />
+```
