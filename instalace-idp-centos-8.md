@@ -13,6 +13,7 @@ yum install xauth
 yum install net-tools
 yum install java-11-openjdk java-11-openjdk-headless
 yum update
+yum install stunnel
 ```
 Do `.bash_profile` přidáme
 ```
@@ -138,6 +139,29 @@ mysql-connector-java-5.1.39-bin.jar
 # Instalace stunnel
 Protože jako obvykle je oser s připojením k Oracle LDAPu je třeba Stunel. A navíc Oracle LDAP neumí TLS takže to nechodí s stunnelem z distribuce.
 Takže nakopírujeme z centos 6 (ještě že ho máme) 
+```
+cp libnsl.so.1 /lib64/
+cp libssl.so.10  /usr/lib64/
+cp libcrypto.so.10 /usr/lib64/libcrypto.so.10
+cp libwrap.so.0 /lib64/libwrap.so.0
+cp /usr/bin/stunnel /usr/bin/stunnel.bak
+cp stunnel /usr/bin/stunnel
+```
+Do `/etc/stunnel/stunnel.conf` dáme obsah:
+```
+socket = l:TCP_NODELAY=1
+socket = r:TCP_NODELAY=1
+sslVersion = SSLv3
+client=yes
+[ldap]
+accept  = 127.0.0.1:50000
+connect = oid1.eis.cas.cz:3132
+```
+a
+```
+systemctl enable stunnel
+systemctl start stunnel
+```
 # Mysql
 ## Konfigurace serveru
 Start serveru
@@ -184,7 +208,3 @@ Poslední věc je přenos dat z minulé instalace. Uloženo pomocí mysqldump.
 ```
 mysql -p -u root shibboleth < ~/shibbolethdb.sql
 ```
-
-
-
-
