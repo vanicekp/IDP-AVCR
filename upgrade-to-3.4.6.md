@@ -138,3 +138,101 @@ Pro složitost a množství změn je lepší nahradit soubor novým z matrice a 
             <SourceValue>{ID-foo-number}(.+)</SourceValue>
         </ValueMap>
     </AttributeDefinition>
+
+<!-- eduPersonUniqueId -->
+<AttributeDefinition id="eduPersonUniqueId" xsi:type="Scoped" scope="%{idp.scope}">
+    <InputAttributeDefinition ref="unstructuredName" />
+    <DisplayName xml:lang="cs">Unikátní, neměnný identifikátor uživatele</DisplayName>
+    <DisplayName xml:lang="en">Unique life-time persistent user identifier</DisplayName>
+    <AttributeEncoder xsi:type="SAML2ScopedString" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.13" friendlyName="eduPersonUniqueId" encodeType="false" />
+</AttributeDefinition>
+
+<!-- uniqueIdentifier -->
+    <AttributeDefinition xsi:type="Simple" id="uniqueIdentifier">
+    <InputDataConnector ref="myLDAP" attributeNames="businesscategory" />
+        <AttributeEncoder xsi:type="SAML1String" name="urn:mace:dir:attribute-def:uniqueIdentifier" />
+        <AttributeEncoder xsi:type="SAML2String" name="urn:oid:0.9.2342.19200300.100.1.44" friendlyName="uniqueIdentifier" />
+    </AttributeDefinition>
+
+<!-- mail  pro TCS-P -->
+    <AttributeDefinition xsi:type="Simple" id="tcsmail">
+        <InputDataConnector ref="myLDAP" attributeNames="mail" />
+        <AttributeEncoder xsi:type="SAML1String" name="urn:mace:dir:attribute-def:tcsmail" />
+        <AttributeEncoder xsi:type="SAML2String" name="urn:oid:1.2.840.113549.1.9.1" friendlyName="tcsmail" />
+    </AttributeDefinition>
+
+<!-- organizationName -->
+     <AttributeDefinition id="organizationName" xsi:type="Simple">
+        <InputDataConnector ref="staticAttributes" attributeNames="organizationName"/>
+        <AttributeEncoder xsi:type="SAML1String" name="urn:mace:dir:attribute-def:o" />
+        <AttributeEncoder xsi:type="SAML2String" name="urn:oid:2.5.4.10" friendlyName="o" />
+     </AttributeDefinition>
+
+<!-- schacHomeOrg -->
+     <AttributeDefinition id="schacHomeOrg" xsi:type="Simple">
+        <InputDataConnector ref="staticAttributes" attributeNames="schacHomeOrg"/>
+        <AttributeEncoder xsi:type="SAML1String" name="urn:oid:1.3.6.1.4.1.25178.1.2.9" />
+        <AttributeEncoder xsi:type="SAML2String" name="urn:oid:1.3.6.1.4.1.25178.1.2.9" friendlyName="schacHomeOrg" />
+     </AttributeDefinition>
+
+<!-- eduPersonEntitlement pro TCS-P -->
+   <AttributeDefinition xsi:type="ScriptedAttribute" id="eduPersonEntitlement" >
+        <InputAttributeDefinition ref="unstructuredName" />
+        <InputAttributeDefinition ref="uniqueIdentifier" />
+        <AttributeEncoder xsi:type="SAML1String" name="urn:mace:dir:attribute-def:eduPersonEntitlement" />
+        <AttributeEncoder xsi:type="SAML2String" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.7" friendlyName="eduPersonEntitlement" />
+        <ScriptFile>/opt/idp/common/script/eduPersonEntitlement{Foo}.js</ScriptFile>
+    </AttributeDefinition>
+
+<!-- eduPersonTargetedID  -->
+     <AttributeDefinition id="eduPersonTargetedID" xsi:type="SAML2NameID"  nameIdFormat="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent">
+        <InputDataConnector ref="myStoredId" attributeNames="persistentID"/>
+        <AttributeEncoder xsi:type="SAML1XMLObject" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.10" />
+        <AttributeEncoder xsi:type="SAML2XMLObject" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.10" friendlyName="eduPersonTargetedID" />
+     </AttributeDefinition>
+
+
+    <!-- ========================================== -->
+    <!--      Data Connectors                       -->
+    <!-- ========================================== -->
+
+    <!--
+        LDAP Connector
+        https://wiki.shibboleth.net/confluence/display/SHIB2/ResolverLDAPDataConnector
+    -->
+    <DataConnector id="myLDAP" xsi:type="LDAPDirectory"
+        ldapURL="ldap://localhost:50000"
+        baseDN="cn=Users,dc=eis,dc=cas,dc=cz"
+        >
+        <FilterTemplate>
+            <![CDATA[
+                (cn=$resolutionContext.principal)
+            ]]>
+        </FilterTemplate>
+    </DataConnector>
+
+<!-- Static Data Connector -->
+
+<DataConnector id="staticAttributes" xsi:type="Static">
+    <Attribute id="organizationName">
+        <Value>{NAME}</Value>
+    </Attribute>
+        <Attribute id="eduPersonAffiliation">
+            <Value>staff</Value>
+            <Value>employee</Value>
+            <Value>member</Value>
+        </Attribute>
+    <Attribute id="schacHomeOrg">
+        <Value>%{idp.scope}</Value>
+    </Attribute>
+</DataConnector>
+
+<DataConnector id="myStoredId"
+    xsi:type="StoredId"
+    generatedAttributeID="persistentID"
+    salt="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    queryTimeout="P0Y0M0DT0H0M0.000S">
+    <BeanManagedConnection>shibboleth.MySQLDataSource</BeanManagedConnection>
+    <InputAttributeDefinition ref="eduPersonPrincipalName" />
+</DataConnector>
+```
