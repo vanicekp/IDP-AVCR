@@ -210,3 +210,9 @@ Poslední věc je přenos dat z minulé instalace. Uloženo pomocí mysqldump.
 ```
 mysql -p -u root shibboleth < ~/shibbolethdb.sql
 ```
+## Nastavení systému pro velkou zátěž
+V souboru `/etc/security/limits.conf` přidat na konec:
+```
+idp - nofile 65536
+idp - nproc 65536
+```
