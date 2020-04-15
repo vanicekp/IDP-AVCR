@@ -38,6 +38,7 @@ echo "JETTY_HOME=/opt/jetty-distribution-9.4.27.v20200227" > /etc/default/jetty
 echo "JETTY_BASE=/opt/jetty" >> /etc/default/jetty
 echo "JETTY_USER=idp" >> /etc/default/jetty
 echo "JETTY_RUN=/opt/run" >> /etc/default/jetty
+echo "JAVA_OPTIONS='-Xmx16g -Xms16g'"  >> /etc/default/jetty
 mkdir /opt/run
 chown idp /opt/run
 mkdir /opt/jetty
