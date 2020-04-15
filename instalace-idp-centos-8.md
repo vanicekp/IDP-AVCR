@@ -115,6 +115,101 @@ Upravíme `start.d/http.ini` tak aby pro http běžel jen na localhostu.
 jetty.http.host=localhost
 ```
 Do adresáře `/opt/jetty/webapps` nakopírujeme adresář `root` ze starého serveru. Jsou tam loga a další spubory vhodné pro běh IdP.
+V adresáři /opt/jetty-distribution-9.4.27.v20200227/etc smázneme `jetty-rewrite.xml` a do adreáře `/opt/jetty/etc` dáme soubor
+`jetty-rewrite.xml` s obsahem:
+```
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_3.dtd">
+ 
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
+ 
+    <Call name="insertHandler">
+        <Arg>
+            <New class="org.eclipse.jetty.rewrite.handler.RewriteHandler">
+ 
+                <Set name="rewriteRequestURI"><Property name="jetty.rewrite.rewriteRequestURI" deprecated="rewrite.rewriteRequestURI" default="true"/></Set>
+                <Set name="rewritePathInfo"><Property name="jetty.rewrite.rewritePathInfo" deprecated="rewrite.rewritePathInfo" default="false"/></Set>
+                <Set name="originalPathAttribute"><Property name="jetty.rewrite.originalPathAttribute" deprecated="rewrite.originalPathAttribute" default="requestedPath"/></Set>
+ 
+                <Set name="dispatcherTypes">
+                    <Array type="javax.servlet.DispatcherType">
+                        <Item><Call class="javax.servlet.DispatcherType" name="valueOf"><Arg>REQUEST</Arg></Call></Item>
+                        <Item><Call class="javax.servlet.DispatcherType" name="valueOf"><Arg>ASYNC</Arg></Call></Item>
+                    </Array>
+                </Set>
+ 
+                <!-- Strict-Transport-Security -->
+                <Call name="addRule">
+                    <Arg>
+                        <New class="org.eclipse.jetty.rewrite.handler.HeaderPatternRule">
+                            <Set name="pattern">*</Set>
+                            <Set name="name">Strict-Transport-Security</Set>
+                            <Set name="value">max-age=15768000</Set>
+                        </New>
+                    </Arg>
+                </Call>
+ 
+                <!-- X-Content-Type-Options -->
+                <Call name="addRule">
+                    <Arg>
+                        <New class="org.eclipse.jetty.rewrite.handler.HeaderPatternRule">
+                            <Set name="pattern">*</Set>
+                            <Set name="name">X-Content-Type-Options</Set>
+                            <Set name="value">nosniff</Set>
+                        </New>
+                    </Arg>
+                </Call>
+ 
+                <!-- X-Xss-Protection -->
+                <Call name="addRule">
+                    <Arg>
+                        <New class="org.eclipse.jetty.rewrite.handler.HeaderPatternRule">
+                            <Set name="pattern">*</Set>
+                            <Set name="name">X-Xss-Protection</Set>
+                            <Set name="value">1; mode=block</Set>
+                        </New>
+                    </Arg>
+                </Call>
+ 
+                <!-- X-Frame-Options -->
+                <Call name="addRule">
+                    <Arg>
+                        <New class="org.eclipse.jetty.rewrite.handler.HeaderPatternRule">
+                            <Set name="pattern">*</Set>
+                            <Set name="name">X-Frame-Options</Set>
+                            <Set name="value">DENY</Set>
+                        </New>
+                    </Arg>
+                </Call>
+ 
+                <!-- Content-Security-Policy -->
+                <Call name="addRule">
+                    <Arg>
+                        <New class="org.eclipse.jetty.rewrite.handler.HeaderPatternRule">
+                            <Set name="pattern">*</Set>
+                            <Set name="name">Content-Security-Policy</Set>
+                            <Set name="value">default-src 'self'; style-src 'self'; script-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; frame-ancestors 'none'</Set>
+                        </New>
+                    </Arg>
+                </Call>
+ 
+                <!-- Referrer-Policy -->
+                <Call name="addRule">
+                    <Arg>
+                        <New class="org.eclipse.jetty.rewrite.handler.HeaderPatternRule">
+                            <Set name="pattern">*</Set>
+                            <Set name="name">Referrer-Policy</Set>
+                            <Set name="value">no-referrer-when-downgrade</Set>
+                        </New>
+                    </Arg>
+                </Call>
+ 
+            </New>
+        </Arg>
+    </Call>
+ 
+</Configure>
+```
 
 ## Konfigurace firewallu
 Pomocí rozhraní `firewall-config` a `firewall-cmd` je třeba definovat trusted zonu (IP rozsah), z té povolit ssh a https. V zoně public povolit  https a zakazat ssh.
