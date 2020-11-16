@@ -81,5 +81,26 @@ idp.attribute.resolver.LDAP.responseTimeout     = 300
 #idp.pool.LDAP.blockWaitTime                    = 3000
 #idp.pool.LDAP.failFastInitialize               = false
 ```
-Je to v templates `cp /opt/templates/shibboleth/eis3/ldap.properties conf/`.
+Je to v templates `cp /opt/templates/shibboleth/eis3/ldap.properties conf/`. Pozor na úpravu filtru je shodný s filtrem v jaas.conf a nebo se dají použít operátory pro ldapsearch viz `http://www.ldapexplorer.com/en/manual/109010000-ldap-filter-syntax.htm`
+
+### Úprava attribute-resolver.xml
+#### Úprava LDAP Connector
+Musí se změnit LDAP Connector tak aby používal nový LDAP
+```
+<!-- LDAP Connector -->
+<DataConnector id="myLDAP" xsi:type="LDAPDirectory" ldapURL="%{idp.attribute.resolver.LDAP.ldapURL}" baseDN="%{idp.attribute.resolver.LDAP.baseDN}" principal="%{idp.attribute.resolver.LDAP.bindDN}" principalCredential="%{idp.attribute.resolver.LDAP.bindDNCredential}" useStartTLS="%{idp.attribute.resolver.LDAP.useStartTLS:true}" connectTimeout="%{idp.attribute.resolver.LDAP.connectTimeout}" trustFile="%{idp.attribute.resolver.LDAP.trustCertificates}" responseTimeout="%{idp.attribute.resolver.LDAP.responseTimeout}">
+
+<FilterTemplate>
+%{idp.attribute.resolver.LDAP.searchFilter}
+</FilterTemplate>
+
+</DataConnector>
+```
+#### Úprava attributů
+Protože LDAP EIS3 má jinak pojmenované attributy je třeba provést následující záměny v konfiguračním souboru:
+```
+businesscategory  -->  businessCategory    1x
+employeenumber -->  employeeNumber    2x
+givenname --> givenName  6x
+
 
