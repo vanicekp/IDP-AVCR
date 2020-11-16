@@ -82,6 +82,7 @@ idp.attribute.resolver.LDAP.responseTimeout     = 300
 #idp.pool.LDAP.failFastInitialize               = false
 ```
 Je to v templates `cp /opt/templates/shibboleth/eis3/ldap.properties conf/`. Pozor na úpravu filtru je shodný s filtrem v jaas.conf a nebo se dají použít operátory pro ldapsearch viz `http://www.ldapexplorer.com/en/manual/109010000-ldap-filter-syntax.htm`,
+
 a nezapomenout nakopírovat certifikát pro LDAP CA `cp /opt/templates/shibboleth/eis3/ldap-server.crt credentials/`.
 
 
@@ -105,4 +106,7 @@ businesscategory  -->  businessCategory    1x
 employeenumber -->  employeeNumber    2x
 givenname --> givenName  6x
 
+
+### Konfigurace jetty
+`cp /root/webapps/idp.Foo.cas.cz.xml /opt/jetty/webapps/ `
 
