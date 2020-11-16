@@ -1,4 +1,4 @@
-# Konverce IdP pro openLDAP z EIS3
+# Konverze IdP pro openLDAP z EIS3
 ## Příprava virtuálu
 Prostá konverze virtuálu na jiné jméno a změna IP adresy a hostnem použito nmtui. Přesun všech `idp*.xml` z `/opt/jetty/webapps/` do zálohy. A start jetty.
 Zakomentování hlídacích scriptů v crontab. Úprava scriptů a odkomentování monitorovacího.
@@ -81,7 +81,9 @@ idp.attribute.resolver.LDAP.responseTimeout     = 300
 #idp.pool.LDAP.blockWaitTime                    = 3000
 #idp.pool.LDAP.failFastInitialize               = false
 ```
-Je to v templates `cp /opt/templates/shibboleth/eis3/ldap.properties conf/`. Pozor na úpravu filtru je shodný s filtrem v jaas.conf a nebo se dají použít operátory pro ldapsearch viz `http://www.ldapexplorer.com/en/manual/109010000-ldap-filter-syntax.htm`
+Je to v templates `cp /opt/templates/shibboleth/eis3/ldap.properties conf/`. Pozor na úpravu filtru je shodný s filtrem v jaas.conf a nebo se dají použít operátory pro ldapsearch viz `http://www.ldapexplorer.com/en/manual/109010000-ldap-filter-syntax.htm`,
+a nezapomenout nakopírovat certifikát pro LDAP CA `cp /opt/templates/shibboleth/eis3/ldap-server.crt credentials/`.
+
 
 ### Úprava attribute-resolver.xml
 #### Úprava LDAP Connector
