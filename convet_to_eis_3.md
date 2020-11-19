@@ -90,14 +90,29 @@ a nezapomenout nakopírovat certifikát pro LDAP CA `cp /opt/templates/shibbolet
 #### Úprava LDAP Connector
 Musí se změnit LDAP Connector tak aby používal nový LDAP
 ```
-<!-- LDAP Connector -->
-<DataConnector id="myLDAP" xsi:type="LDAPDirectory" ldapURL="%{idp.attribute.resolver.LDAP.ldapURL}" baseDN="%{idp.attribute.resolver.LDAP.baseDN}" principal="%{idp.attribute.resolver.LDAP.bindDN}" principalCredential="%{idp.attribute.resolver.LDAP.bindDNCredential}" useStartTLS="%{idp.attribute.resolver.LDAP.useStartTLS:true}" connectTimeout="%{idp.attribute.resolver.LDAP.connectTimeout}" trustFile="%{idp.attribute.resolver.LDAP.trustCertificates}" responseTimeout="%{idp.attribute.resolver.LDAP.responseTimeout}">
-
-<FilterTemplate>
-%{idp.attribute.resolver.LDAP.searchFilter}
-</FilterTemplate>
-
-</DataConnector>
+  <!-- LDAP Connector -->
+    <DataConnector id="myLDAP" xsi:type="LDAPDirectory"
+        ldapURL="%{idp.attribute.resolver.LDAP.ldapURL}"
+        baseDN="%{idp.attribute.resolver.LDAP.baseDN}"
+        principal="%{idp.attribute.resolver.LDAP.bindDN}"
+        principalCredential="%{idp.attribute.resolver.LDAP.bindDNCredential}"
+        useStartTLS="%{idp.attribute.resolver.LDAP.useStartTLS:true}"
+        connectTimeout="%{idp.attribute.resolver.LDAP.connectTimeout}"
+                trustFile="%{idp.attribute.resolver.LDAP.trustCertificates}"
+        responseTimeout="%{idp.attribute.resolver.LDAP.responseTimeout}">
+        <FilterTemplate>
+            <![CDATA[
+                %{idp.attribute.resolver.LDAP.searchFilter}
+            ]]>
+        </FilterTemplate>
+            <ConnectionPool
+            minPoolSize="%{idp.pool.LDAP.minSize:3}"
+            maxPoolSize="%{idp.pool.LDAP.maxSize:10}"
+            blockWaitTime="%{idp.pool.LDAP.blockWaitTime:PT3S}"
+            validatePeriodically="%{idp.pool.LDAP.validatePeriodically:true}"
+            validateTimerPeriod="%{idp.pool.LDAP.validatePeriod:PT5M}"
+            expirationTime="%{idp.pool.LDAP.idleTime:PT10M}" />
+    </DataConnector>
 ```
 #### Úprava attributů
 Protože LDAP EIS3 má jinak pojmenované attributy je třeba provést následující záměny v konfiguračním souboru:
