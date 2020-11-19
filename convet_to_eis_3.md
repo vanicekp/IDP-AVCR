@@ -105,8 +105,8 @@ Protože LDAP EIS3 má jinak pojmenované attributy je třeba provést následuj
 businesscategory  -->  businessCategory    1x
 employeenumber -->  employeeNumber    2x
 givenname --> givenName  5x
-
+```
 
 ### Konfigurace jetty
-`cp /root/webapps/idp.Foo.cas.cz.xml /opt/jetty/webapps/ `
+`cp /root/webapps/idp.Foo.cas.cz.xml /opt/jetty/webapps/`
 
