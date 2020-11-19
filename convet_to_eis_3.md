@@ -104,7 +104,7 @@ Protože LDAP EIS3 má jinak pojmenované attributy je třeba provést následuj
 ```
 businesscategory  -->  businessCategory    1x
 employeenumber -->  employeeNumber    2x
-givenname --> givenName  6x
+givenname --> givenName  5x
 
 
 ### Konfigurace jetty
