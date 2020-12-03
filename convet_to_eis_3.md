@@ -85,6 +85,12 @@ Je to v templates `cp /opt/templates/shibboleth/eis3/ldap.properties conf/`. Poz
 
 a nezapomenout nakopírovat certifikát pro LDAP CA `cp /opt/templates/shibboleth/eis3/ldap-server.crt credentials/`.
 
+### Varování při nové instalci
+Při nové čerstvé instalci je nově `idp.authn.LDAP.bindDNCredential` v souboru `credentials/secrets.properties` a taky je tam `idp.persistentId.salt` ze souboru 
+`conf/saml-nameid.properties`. Hlavně `idp.authn.LDAP.bindDNCredential` je problém protože přepisuje hodnotu z `idp.authn.LDAP.bindDNCredential`.
+
+
+
 
 ### Úprava attribute-resolver.xml
 #### Úprava LDAP Connector
