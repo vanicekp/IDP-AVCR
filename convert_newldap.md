@@ -27,7 +27,7 @@ vi webapp/WEB-INF/web.xml
 Spustí se instalace:
 ```
 ./bin/install.sh
-
+```
 
 ## Konverze konfigurace
 ###Změna typu autentifikace z jaas na LDAP, je to v souboru `conf/authn/password-authn-config.xml`.
@@ -48,7 +48,7 @@ Spustí se instalace:
 idp.authn.LDAP.authenticator                   = bindSearchAuthenticator
 
 ## Connection properties ##
-idp.authn.LDAP.ldapURL                          = ldaps://auth1.eis.cas.cz
+idp.authn.LDAP.ldapURL                          = ldaps://ldap1.eis.cas.cz
 idp.authn.LDAP.useStartTLS                     = false
 #idp.authn.LDAP.useSSL                          = false
 #idp.authn.LDAP.connectTimeout                  = 3000
