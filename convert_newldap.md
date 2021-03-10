@@ -6,6 +6,8 @@ Zakomentování hlídacích scriptů v crontab. Úprava scriptů a odkomentován
 systemctl disable stunnel
 systemctl stop stunnel
 ```
+Úprava `JAVA_HOME` na `/usr/lib/jvm/java-11-openjdk-11.0.6.10-0.el8_1.x86_64` v souboru `.bashrc`.
+
 ## Upgrade IdP na 4.0.1
 ```
 cd dist/
