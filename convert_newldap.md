@@ -6,6 +6,27 @@ Zakomentování hlídacích scriptů v crontab. Úprava scriptů a odkomentován
 systemctl disable stunnel
 systemctl stop stunnel
 ```
+## Upgrade IdP na 4.0.1
+```
+cd dist/
+cp -r ../src/shibboleth-identity-provider-4.0.1 idp.foo.cas.cz-source
+cd idp.ssc.cas.cz-source/
+```
+Editace `web.xml` doplní se za `<display-name>`
+```
+vi webapp/WEB-INF/web.xml
+```
+```
+<context-param>
+    <param-name>idp.home</param-name>
+    <param-value>/opt/idp/idp.foo.cas.cz</param-value>
+</context-param>
+```
+Spustí se instalace:
+```
+./bin/install.sh
+
+
 ## Konverze konfigurace
 ###Změna typu autentifikace z jaas na LDAP, je to v souboru `conf/authn/password-authn-config.xml`.
 
