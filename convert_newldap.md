@@ -8,10 +8,10 @@ systemctl stop stunnel
 ```
 Úprava `JAVA_HOME` na `/usr/lib/jvm/java-11-openjdk-11.0.6.10-0.el8_1.x86_64` v souboru `.bashrc`.
 
-## Upgrade IdP na 4.0.1
+## Upgrade IdP na 4.1.0
 ```
 cd dist/
-cp -r ../src/shibboleth-identity-provider-4.0.1 idp.foo.cas.cz-source
+cp -r ../src/shibboleth-identity-provider-4.1.0 idp.foo.cas.cz-source
 cd idp.ssc.cas.cz-source/
 ```
 Editace `web.xml` doplní se za `<display-name>`
@@ -115,7 +115,12 @@ a nezapomenout nakopírovat certifikát pro LDAP CA `cp /opt/templates/shibbolet
 Při nové čerstvé instalci je nově `idp.authn.LDAP.bindDNCredential` v souboru `credentials/secrets.properties` a taky je tam `idp.persistentId.salt` ze souboru 
 `conf/saml-nameid.properties`. Hlavně `idp.authn.LDAP.bindDNCredential` je problém protože přepisuje hodnotu z `idp.authn.LDAP.bindDNCredential`.
 
-
+### Změna filtrace uvolňování attributů
+```
+cd conf/intercept
+cp consent-intercept-config.xml.idpnew consent-intercept-config.xml
+cd ../..
+```
 
 
 ### Úprava attribute-resolver.xml
