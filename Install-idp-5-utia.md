@@ -1105,4 +1105,16 @@ systemctl restart jetty11
 ```
 
 
+## Test
+V souboru `conf/access-control.xml` odkomentovat blok a změnit jmeno uživatele
+```
+<entry key="AccessByAdminUser">
+  <bean parent="shibboleth.PredicateAccessControl">
+    <constructor-arg>
+      <bean parent="shibboleth.Conditions.SubjectName" c:collection="#{'jdoe'}" />
+    </constructor-arg>
+  </bean>
+</entry>
+```
 
+Potom na URL `https://idp.ipm.cas.cz/idp/profile/admin/hello` je cvičné přihlašovátko
