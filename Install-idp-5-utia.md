@@ -465,7 +465,7 @@ A nebo pomocí `firewall-config`
 Hotovo
 
 ## Shibboleth IdP
-Stažení Idp ze serveru:
+### Stažení Idp ze serveru:
 ```
 wget -P /opt  https://shibboleth.net/downloads/identity-provider/5.1.2/shibboleth-identity-provider-5.1.2.tar.gz https://shibboleth.net/downloads/identity-provider/5.1.2/shibboleth-identity-provider-5.1.2.tar.gz.asc https://shibboleth.net/downloads/identity-provider/5.1.2/shibboleth-identity-provider-5.1.2.tar.gz.sha256
 ls
@@ -477,7 +477,7 @@ mv shibboleth-identity-provider-5.1.2.tar.gz* src/
 cd src/
 tar -xzvf shibboleth-identity-provider-5.1.2.tar.gz
 ```
-Pokud se bude dělat multiinstalace tak je nutné do souboru `webapp/WEB-INF/web.xml` doplnit magický kód:
+### Pokud se bude dělat multiinstalace tak je nutné do souboru `webapp/WEB-INF/web.xml` doplnit magický kód:
 ```
 <context-param>
     <param-name>idp.home</param-name>
@@ -491,8 +491,61 @@ sed "/<display-name>Shibboleth Identity Provider.*/a <context-param>\n\t\t<param
 mv webapp/WEB-INF/web.xml webapp/WEB-INF/web.xml.bak
 cp webapp/WEB-INF/web.xml.new webapp/WEB-INF/web.xml
 ```
-Spuštění instalace
+### Spuštění instalace
 ```
 mkdir /opt/idp
 ./bin/install.sh 
 ```
+Dostaneme zhruma toto: (ipm nahradit necim jinym)
+```
+Installation Directory: [/opt/shibboleth-idp] ? 
+/opt/idp/idp.ipm.cas.cz
+INFO  - New Install.  Version: 5.1.2
+Host Name: [test.site.cas.cz] ? 
+idp.ipm.cas.cz
+INFO  - Creating idp-signing, CN = idp.ipm.cas.cz URI = https://idp.ipm.cas.cz/idp/shibboleth, keySize=3072
+INFO  - Creating idp-encryption, CN = idp.ipm.cas.cz URI = https://idp.ipm.cas.cz/idp/shibboleth, keySize=3072
+INFO  - Creating backchannel keystore, CN = idp.ipm.cas.cz URI = https://idp.ipm.cas.cz/idp/shibboleth, keySize=3072
+INFO  - Creating Sealer KeyStore
+INFO  - No existing versioning property, initializing...
+SAML EntityID: [https://idp.ipm.cas.cz/idp/shibboleth] ? 
+
+Attribute Scope: [ipm.cas.cz] ? 
+
+INFO  - Initializing OpenSAML using the Java Services API
+INFO  - Algorithm failed runtime support check, will not be usable: http://www.w3.org/2001/04/xmlenc#ripemd160
+INFO  - Algorithm failed runtime support check, will not be usable: http://www.w3.org/2001/04/xmldsig-more#hmac-ripemd160
+INFO  - Algorithm failed runtime support check, will not be usable: http://www.w3.org/2001/04/xmldsig-more#rsa-ripemd160
+INFO  - Including auto-located properties in /opt/idp/idp.ipm.cas.cz/conf/admin/admin.properties
+INFO  - Including auto-located properties in /opt/idp/idp.ipm.cas.cz/conf/authn/authn.properties
+INFO  - Including auto-located properties in /opt/idp/idp.ipm.cas.cz/conf/c14n/subject-c14n.properties
+INFO  - Including auto-located properties in /opt/idp/idp.ipm.cas.cz/conf/ldap.properties
+INFO  - Including auto-located properties in /opt/idp/idp.ipm.cas.cz/conf/saml-nameid.properties
+INFO  - Including auto-located properties in /opt/idp/idp.ipm.cas.cz/conf/services.properties
+INFO  - Creating Metadata to /opt/idp/idp.ipm.cas.cz/metadata/idp-metadata.xml
+INFO  - Rebuilding /opt/idp/idp.ipm.cas.cz/war/idp.war, Version 5.1.2
+INFO  - Initial populate from /opt/idp/idp.ipm.cas.cz/dist/webapp to /opt/idp/idp.ipm.cas.cz/webpapp.tmp
+INFO  - Overlay from /opt/idp/idp.ipm.cas.cz/edit-webapp to /opt/idp/idp.ipm.cas.cz/webpapp.tmp
+INFO  - Creating war file /opt/idp/idp.ipm.cas.cz/war/idp.war
+```
+### Konfigurace 
+přechod do adresáře /opt/idp/idp.utia.cas.cz
+### idp.properties
+ v `conf/idp.properties` se nastaví proměné pro consent, lokálního HTML úložiště, a zkaz lepších šifer přestože to CESNET nedoporučuje.
+ ```
+vi conf/idp.properties
+
+idp.consent.StorageService = shibboleth.JPAStorageService
+idp.storage.htmlLocalStorage = false
+#idp.encryption.config=shibboleth.EncryptionConfiguration.GCM
+```
+
+
+### ldap.properties
+
+Dopíšu později
+
+### secrets.properties
+
+
+
