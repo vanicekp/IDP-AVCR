@@ -796,7 +796,7 @@ logger.debug("ePPN final value: " + eduPersonPrincipalName.getValues().get(0));
     </AttributeDefinition>
 
 <!-- organizationName -->
-     <AttributeDefinition id="organizationName" xsi:type="Simple">
+     <AttributeDefinition id="o" xsi:type="Simple">
         <InputDataConnector ref="staticAttributes" attributeNames="organizationName"/>
      </AttributeDefinition>
 
