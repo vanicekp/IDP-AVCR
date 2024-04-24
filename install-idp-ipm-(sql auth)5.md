@@ -600,7 +600,249 @@ wget -P credentials \
 
 ### attribute-resolver.xml
 
-Pozdeji
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<AttributeResolver
+        xmlns="urn:mace:shibboleth:2.0:resolver" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:schemaLocation="urn:mace:shibboleth:2.0:resolver http://shibboleth.net/schema/idp/shibboleth-attribute-resolver.xsd">
+
+<AttributeDefinition id="eduPersonPrincipalName" xsi:type="ScriptedAttribute">
+    <InputDataConnector ref="mySQL" attributeNames="pager username"/>
+    <Script><![CDATA[
+logger = Java.type("org.slf4j.LoggerFactory").getLogger("net.shibboleth.idp.attribute.resolver.eppnbuilder");
+scopedValueType =  Java.type("net.shibboleth.idp.attribute.ScopedStringAttributeValue");
+var localpart = "";
+if (pager.getValues().get(0) == 'NE') {
+    logger.debug("No pager in LDAP found, creating uid");
+    localpart = username.getValues().get(0);
+} else {
+    logger.debug("pager in LDAP found");
+    localpart = pager.getValues().get(0);
+}
+eduPersonPrincipalName.addValue(new scopedValueType(localpart, "%{idp.scope}"));
+logger.debug("ePPN final value: " + eduPersonPrincipalName.getValues().get(0));
+    ]]>
+</Script>
+</AttributeDefinition>
+
+<!-- mail -->
+    <AttributeDefinition xsi:type="Simple" id="mail" >
+        <InputDataConnector ref="mySQL" attributeNames="mail"/>
+    </AttributeDefinition>
+
+<!-- mail  pro TCS-P -->
+    <AttributeDefinition xsi:type="Simple" id="authMail">
+        <InputDataConnector ref="mySQL" attributeNames="mail"/>
+    </AttributeDefinition>
+
+
+    <AttributeDefinition id="uid" xsi:type="PrincipalName">
+    </AttributeDefinition>
+
+<!-- Schema: eduPerson attributes -->
+    <AttributeDefinition xsi:type="Simple" id="eduPersonAffiliation">
+        <InputDataConnector ref="staticAttributes" attributeNames="eduPersonAffiliation"/>
+    </AttributeDefinition>
+
+<!-- eduPersonScopedAffiliation -->
+    <AttributeDefinition xsi:type="Scoped" id="eduPersonScopedAffiliation" scope="%{idp.scope}" >
+        <InputDataConnector ref="staticAttributes" attributeNames="eduPersonAffiliation"/>
+    </AttributeDefinition>
+
+<!-- eduPersonEntitlement pro TCS-P -->
+   <AttributeDefinition xsi:type="ScriptedAttribute" id="eduPersonEntitlement" >
+        <InputAttributeDefinition ref="unstructuredName" />
+        <InputAttributeDefinition ref="uniqueIdentifier" />
+        <ScriptFile>/opt/idp/common/script/eduPersonEntitlementIpm.js</ScriptFile>
+    </AttributeDefinition>
+
+<!-- givenName -->
+    <AttributeDefinition xsi:type="Simple" id="givenName">
+        <InputDataConnector ref="mySQL" attributeNames="givenName"/>
+    </AttributeDefinition>
+
+<!-- surname -->
+<AttributeDefinition id="sn" xsi:type="Simple" >
+    <InputDataConnector ref="mySQL" attributeNames="sn"/>
+</AttributeDefinition>
+
+<!-- displayName -->
+   <AttributeDefinition xsi:type="Template" id="displayName">
+        <InputDataConnector ref="mySQL" attributeNames="sn givenName"/>
+        <Template>${givenName} ${sn}</Template>
+    </AttributeDefinition>
+
+<!-- commonName -->
+    <AttributeDefinition xsi:type="Template" id="cn">
+        <InputDataConnector ref="mySQL" attributeNames="sn givenName"/>
+        <Template>${givenName} ${sn}</Template>
+    </AttributeDefinition>
+
+<!-- commonName#ASCII pro TCS-P -->
+    <AttributeDefinition xsi:type="ScriptedAttribute" id="commonNameASCII">
+        <InputAttributeDefinition ref="cn" />
+        <Script>
+        <![CDATA[
+            load("nashorn:mozilla_compat.js");
+
+            importPackage(Packages.edu.internet2.middleware.shibboleth.common.attribute.provider);
+            importPackage(Packages.java.lang);
+            importPackage(Packages.java.text);
+
+            if(cn.getValues().size() > 0) {
+                originalValue = cn.getValues().get(0);
+                asciiValue = Normalizer.normalize(originalValue, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+                commonNameASCII.getValues().add(asciiValue);
+            }
+        ]]>
+        </Script>
+    </AttributeDefinition>
+
+<!-- employeeNumber -->
+    <AttributeDefinition xsi:type="Simple" id="employeeNumber">
+        <InputDataConnector ref="mySQL" attributeNames="unstructuredName"/>
+    </AttributeDefinition>
+
+<!-- unstructuredName pro TCS-P -->
+    <AttributeDefinition xsi:type="Simple" id="unstructuredName" >
+        <InputDataConnector ref="mySQL" attributeNames="unstructuredName"/>
+    </AttributeDefinition>
+
+<!-- eduPersonUniqueId -->
+<AttributeDefinition id="eduPersonUniqueId" xsi:type="Scoped" scope="%{idp.scope}" >
+    <InputAttributeDefinition ref="unstructuredName" />
+</AttributeDefinition>
+
+<!-- uniqueIdentifier -->
+    <AttributeDefinition xsi:type="Simple"  id="uniqueIdentifier">
+        <InputDataConnector ref="staticAttributes" attributeNames="uniqueIdentifier"/>
+    </AttributeDefinition>
+
+<!-- telephoneNumber -->
+    <AttributeDefinition xsi:type="Simple" id="telephoneNumber">
+        <InputDataConnector ref="mySQL" attributeNames="telephoneNumber"/>
+    </AttributeDefinition>
+
+<!-- organizationName -->
+     <AttributeDefinition id="o" xsi:type="Simple">
+        <InputDataConnector ref="staticAttributes" attributeNames="organizationName"/>
+     </AttributeDefinition>
+
+<!-- organizationalUnit -->
+    <AttributeDefinition xsi:type="Simple" id="ou">
+        <InputDataConnector ref="mySQL" attributeNames="ou"/>
+    </AttributeDefinition>
+
+
+<!-- schacHomeOrg -->
+     <AttributeDefinition id="schacHomeOrganization" xsi:type="Simple" >
+        <InputDataConnector ref="staticAttributes"  attributeNames="schacHomeOrg"/>
+     </AttributeDefinition>
+
+<!-- eduPersonTargetedID -->
+     <AttributeDefinition id="eduPersonTargetedID" xsi:type="SAML2NameID" nameIdFormat="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent">
+        <InputDataConnector ref="myStoredId" attributeNames="persistentID" />
+        <AttributeEncoder xsi:type="SAML2XMLObject" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.10"/>
+     </AttributeDefinition>
+
+
+<AttributeDefinition xsi:type="Scoped" id="samlPairwiseID" scope="%{idp.scope}">
+    <InputDataConnector ref="computed" attributeNames="computedId"/>
+</AttributeDefinition>
+
+<AttributeDefinition xsi:type="ScriptedAttribute" id="samlSubjectHash" dependencyOnly="true">
+    <InputAttributeDefinition ref="unstructuredName"/>
+    <Script>
+        <![CDATA[
+            if (typeof unstructuredName != "undefined" && unstructuredName != "null" && unstructuredName.getValues().size()) {
+                var digestUtils = Java.type("org.apache.commons.codec.digest.DigestUtils");
+                var saltedHash = digestUtils.sha256Hex(unstructuredName.getValues().get(0) + "%{idp.persistentId.salt}");
+                samlSubjectHash.addValue(saltedHash);
+            }
+        ]]>
+    </Script>
+</AttributeDefinition>
+
+<AttributeDefinition xsi:type="Scoped" id="samlSubjectID" scope="%{idp.scope}">
+    <InputAttributeDefinition ref="samlSubjectHash"/>
+</AttributeDefinition>
+
+<!-- eduPersonAssurance -->
+<AttributeDefinition xsi:type="Simple" id="eduPersonAssurance">
+    <InputDataConnector ref="staticAttributes" attributeNames="eduPersonAssurance" />
+</AttributeDefinition>
+
+
+
+
+    <!-- ========================================== -->
+    <!--      Data Connectors                       -->
+    <!-- ========================================== -->
+
+
+<!-- Static Data Connector -->
+<DataConnector id="staticAttributes" xsi:type="Static">
+    <Attribute id="organizationName">                  
+        <Value>ÚFM AV ČR v.v.i.</Value>               
+    </Attribute>                                       
+       <Attribute id="eduPersonAffiliation">           
+            <Value>staff</Value>                       
+            <Value>employee</Value>                    
+            <Value>member</Value>                      
+        </Attribute>                                   
+    <Attribute id="schacHomeOrg">                      
+        <Value>%{idp.scope}</Value>                    
+    </Attribute>                                       
+        <Attribute id="uniqueIdentifier">              
+            <Value>EduID</Value>                       
+        </Attribute>                                   
+     <Attribute id="eduPersonAssurance">
+        <Value>https://refeds.org/assurance/ID/eppn-unique-no-reassign</Value>
+        <Value>https://refeds.org/assurance/IAP/high</Value>
+    </Attribute>
+</DataConnector>                                       
+
+<DataConnector id="computed"
+    xsi:type="ComputedId"
+    generatedAttributeID="computedId"
+    salt="%{idp.persistentId.salt}"
+    encoding="BASE32">
+        <InputDataConnector ref="mySQL" attributeNames="unstructuredName"/>
+</DataConnector>
+
+
+
+<!-- MySQL Data Connector -->
+<DataConnector id="mySQL"
+    xsi:type="RelationalDatabase">
+    <SimpleManagedConnection
+        jdbcDriver="org.mariadb.jdbc.Driver"
+        jdbcURL="jdbc:mysql://localhost:3306/shibboleth"
+        jdbcUserName="shibboleth"
+        jdbcPassword="xxxxxx"/>
+
+        <QueryTemplate>
+            <![CDATA[
+                SELECT * FROM users WHERE username='$resolutionContext.principal'
+            ]]>
+        </QueryTemplate>
+
+        <Column columnName="telephone" attributeID="telephoneNumber" />
+</DataConnector>
+
+<!-- StoredId Data Connector -->
+<DataConnector id="myStoredId"
+    xsi:type="StoredId"
+    generatedAttributeID="persistentID"
+    salt="c9009136cfeeb19e9be78732a9e29d61"
+    queryTimeout="P0Y0M0DT0H0M0.000S">
+    <InputAttributeDefinition ref="eduPersonPrincipalName" />
+    <BeanManagedConnection>shibboleth.MySQLDataSource</BeanManagedConnection>
+</DataConnector>
+
+</AttributeResolver>
+```
 
 ### cesnetAttributes.xml
 ```
