@@ -678,3 +678,126 @@ idp.persistentId.encoding = BASE64
 idp.persistentId.generator = shibboleth.StoredPersistentIdGenerator
 idp.persistentId.dataSource = shibboleth.MySQLDataSource
 idp.persistentId.sourceAttribute = eduPersonPrincipalName
+
+```
+
+### saml-nameid.xml
+odkomentovat v souboru řádek
+
+```
+vi conf/saml-nameid.xml
+
+<ref bean="shibboleth.SAML2PersistentGenerator" />
+```
+
+### subject-c14n.xml
+Odkomentujeme tedy řádek: 
+```
+vi conf/c14n/subject-c14n.xml
+
+<ref bean="c14n/SAML2Persistent" />
+```
+
+### messages_cs.properties
+Český překlad hlášek
+```
+wget https://shibboleth.atlassian.net/wiki/download/attachments/1265631751/messages_cs.properties \
+    -O messages/messages_cs.properties
+```
+
+### JAAS konfigurace
+V souboru `conf/authn/password-authn-config.xml`
+
+zakomentovat 
+```
+<!-- <ref bean="shibboleth.LDAPValidator" /> -->
+```
+odkomentovat
+```
+<ref bean="shibboleth.JAASValidator" />
+```
+
+Soubor `conf/authn/jaas.config` má obsahovat
+```
+ShibUserPassAuth {
+   com.tagish.auth.DBLogin required debug=true dbDriver="org.mariadb.jdbc.Driver"
+       dbURL="jdbc:mysql://localhost:3306/shibboleth"
+       dbUser="shibboleth" dbPassword="xxxxxxx" userTable="users"
+       userColumn="username" passColumn="password" hashAlgorithm="SHA-512";
+};
+```
+
+Soubor `conf/authn/jaas-authn-config.xml` má obsahovat
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:c="http://www.springframework.org/schema/c"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+
+       default-init-method="initialize"
+       default-destroy-method="destroy">
+
+    <!-- Specify your JAAS config. -->
+    <bean id="JAASConfig" class="org.springframework.core.io.FileSystemResource" c:path="%{idp.home}/conf/authn/jaas.config" />
+
+    <util:property-path id="shibboleth.authn.JAAS.JAASConfigURI" path="JAASConfig.URI" />
+
+    <!-- Specify the application name(s) in the JAAS config. -->
+    <util:list id="shibboleth.authn.JAAS.LoginConfigNames">
+        <value>ShibUserPassAuth</value>
+    </util:list>
+
+    <alias name="ValidateUsernamePasswordAgainstJAAS" alias="ValidateUsernamePassword"/>
+
+</beans>
+```
+Nakopírovat knihovnu
+```
+mkdir -p edit-webapp/WEB-INF/lib/
+cp ~/jaas-rdbms-hashed-master.jar edit-webapp/WEB-INF/lib/
+```
+
+## Spuštění
+opravíme práva v adresáři 
+```
+chown jetty {logs,metadata}
+chgrp -R jetty {conf,credentials}
+chmod -R g+r conf
+chmod 750 credentials
+chmod 640 credentials/*
+```
+ V systemd musíme Jetty povolit přístup pro zápis do adresářů s logy a metadaty. 
+```
+systemctl edit jetty11
+```
+přidáme
+```
+[Service]
+ReadWritePaths=/opt/idp/idp.ipm.cas.cz/logs/
+ReadWritePaths=/opt/idp/idp.ipm.cas.cz/metadata/
+```
+Přidání doplňků a potvrdíme dvakrát pomocí y a enter. 
+```
+./bin/plugin.sh -I net.shibboleth.plugin.storage.jdbc
+./bin/plugin.sh -I net.shibboleth.idp.plugin.nashorn
+```
+
+## Test
+V souboru `conf/access-control.xml` odkomentovat blok a změnit jmeno uživatele
+```
+<entry key="AccessByAdminUser">
+  <bean parent="shibboleth.PredicateAccessControl">
+    <constructor-arg>
+      <bean parent="shibboleth.Conditions.SubjectName" c:collection="#{'jdoe'}" />
+    </constructor-arg>
+  </bean>
+</entry>
+```
+
+Potom na URL `https://idp.ipm.cas.cz/idp/profile/admin/hello` je cvičné přihlašovátko
