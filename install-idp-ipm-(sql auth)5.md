@@ -634,3 +634,47 @@ wget -O conf/attributes/inetOrgPerson.xml \
 wget -O conf/attribute-filter.xml \
     https://www.eduid.cz/shibboleth-idp/attribute-filter.xml
 ```
+
+### idp-metadata.xml
+
+**Zatím ponechat bez zázahu**
+
+### global.xml
+Definice beanu pro přístup do mariadb.
+
+```
+vi conf/global.xml
+
+<bean id="shibboleth.MySQLDataSource"
+    class="org.apache.commons.dbcp2.BasicDataSource"
+    p:driverClassName="org.mariadb.jdbc.Driver"
+    p:url="jdbc:mysql://localhost:3306/shibboleth"
+    p:username="shibboleth"
+    p:password="___SILNE_HESLO___" />
+ 
+    <bean id="JDBCStorageService" parent="shibboleth.JDBCStorageService"
+          p:dataSource-ref="shibboleth.MySQLDataSource"
+          p:transactionIsolation="4"
+          p:retryableErrors="40001"
+     />
+ 
+    <bean id="shibboleth.JPAStorageService"
+        parent="shibboleth.JDBCStorageService"
+        p:cleanupInterval="%{idp.storage.cleanupInterval:PT10M}"
+        p:dataSource-ref="shibboleth.MySQLDataSource"/>
+```
+
+### saml-nameid.properties
+Upravíme a doplníme
+
+```
+vi conf/saml-nameid.properties
+
+#idp.persistentId.sourceAttribute = uid
+# Nové IdP (BASE32)
+#idp.persistentId.encoding = BASE32
+# Migrované IdP (BASE64)
+idp.persistentId.encoding = BASE64
+idp.persistentId.generator = shibboleth.StoredPersistentIdGenerator
+idp.persistentId.dataSource = shibboleth.MySQLDataSource
+idp.persistentId.sourceAttribute = eduPersonPrincipalName
