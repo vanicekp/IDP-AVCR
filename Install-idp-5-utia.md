@@ -67,7 +67,7 @@ mysql -u root -p shibboleth < ~/persistentIDs.sql
 Hotovo
 
 ## Jetty
-Instalace jetty z zdroje:
+### Instalace jetty z zdroje:
 ```
 cd /opt
 mkdir src
@@ -84,7 +84,7 @@ mkdir -p /opt/jetty11-idp/etc
 ls
 mv jetty-home-11.0.16.tar.gz  jetty-home-11.0.16.tar.gz.asc  jetty-home-11.0.16.tar.gz.sha1  src
 ```
-Konfigurace pro potřeby IdP, soubor `/opt/jetty11/modules/` `idp.mod`:
+### Konfigurace pro potřeby IdP, soubor `/opt/jetty11/modules/` `idp.mod`:
 ```
 [description]
 Shibboleth IdP
@@ -113,7 +113,7 @@ Připraven u cesnetu:
 ```
 wget -P /opt/jetty11/modules     https://www.eduid.cz/jetty/idp.mod
 ```
-Keystore, převzat z starého IdP, a nebo vygenerován nový:
+### Keystore, převzat z starého IdP, a nebo vygenerován nový:
 ```
 mv keystore /opt/jetty11-idp/etc/keystore.p12
 ```
@@ -123,7 +123,7 @@ cat cert.pem chain.pem > jetty.txt
 openssl pkcs12 -export -inkey key.pem -in jetty.txt -out jetty.pkcs12
 mv jetty.pkcs12 /opt/jetty11-idp/etc/keystore.p12
 ```
-Založení uživatele pro běh:
+### Založení uživatele pro běh:
 ```
 # Vytvoření uživatele jetty
 useradd -s /bin/false -d /opt/jetty11 jetty
@@ -133,7 +133,7 @@ chmod 640 /opt/jetty11-idp/etc/keystore.p12
 chgrp jetty /opt/jetty11-idp/etc/keystore.p12
 ```
 
-Soubor `/opt/jetty11-idp/start.d/` `idp.ini`
+### Soubor `/opt/jetty11-idp/start.d/` `idp.ini`
 ```
 # --------------------------------------- 
 # Module: idp
@@ -182,7 +182,7 @@ wget -P /opt/jetty11-idp/start.d \
 # Otevřeme konfigurační soubor idp.ini
 vi /opt/jetty11-idp/start.d/idp.ini
 ```
-Soubor `/opt/jetty11-idp/` `tweak-ssl.xml`
+### Soubor `/opt/jetty11-idp/` `tweak-ssl.xml`
 ```
 <?xml version="1.0"?>
 <!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_3.dtd">
@@ -236,7 +236,8 @@ Možno stáhnout
 wget -P /opt/jetty11-idp/etc \
     https://www.eduid.cz/jetty/tweak-ssl.xml
 ```
-Dále soubor `/opt/jetty11-idp/` `idp.xml` pozor bude se pak měnit, ale pro začátek dobrý.
+### Dále soubor `/opt/jetty11-idp/` `idp.xml` 
+pozor bude se pak měnit, ale pro začátek dobrý.
 ```
 <?xml version="1.0"?>
 <!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://www.eclipse.org/jetty/configure_9_3.dtd">
@@ -254,7 +255,7 @@ Možno stáhnout
 wget -P /opt/jetty11-idp/webapps \
     https://www.eduid.cz/jetty/idp.xml
 ```
-A nakonec vytvoření fake titulní stránky s přesměrováním na něco.
+### A nakonec vytvoření fake titulní stránky s přesměrováním na něco.
 ```
 # Vytvoření složky pro statický web v Jetty
 mkdir -p /opt/jetty11-idp/webapps/root
@@ -263,5 +264,205 @@ mkdir -p /opt/jetty11-idp/webapps/root
 echo '<% response.sendRedirect("https://www.example.org"); %>' > \
     /opt/jetty11-idp/webapps/root/index.jsp
 ```
+### Knihovna pro mariadb
+Z místa kam jsme si dali knihovnu ukradenou z debianu ji nakopirujeme do stromu jetty:
+```
+mkdir -p /opt/jetty11-idp/lib/ext
+cp ~/mariadb-java-client.jar \
+      /opt/jetty11-idp/lib/ext/mariadb-java-client.jar
+```
+### Bezpečnost jetty-rewrite.xml
+soubor ` /opt/jetty11-idp/etc/` `jetty-rewrite.xml`
+```
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_3.dtd">
+ 
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
+ 
+    <Call name="insertHandler">
+        <Arg>
+            <New class="org.eclipse.jetty.rewrite.handler.RewriteHandler">
+ 
+                <Set name="rewriteRequestURI"><Property name="jetty.rewrite.rewriteRequestURI" deprecated="rewrite.rewriteRequestURI" default="true"/></Set>
+                <Set name="rewritePathInfo"><Property name="jetty.rewrite.rewritePathInfo" deprecated="rewrite.rewritePathInfo" default="false"/></Set>
+                <Set name="originalPathAttribute"><Property name="jetty.rewrite.originalPathAttribute" deprecated="rewrite.originalPathAttribute" default="requestedPath"/></Set>
+ 
+                <Set name="dispatcherTypes">
+                    <Array type="jakarta.servlet.DispatcherType">
+                        <Item><Call class="jakarta.servlet.DispatcherType" name="valueOf"><Arg>REQUEST</Arg></Call></Item>
+                        <Item><Call class="jakarta.servlet.DispatcherType" name="valueOf"><Arg>ASYNC</Arg></Call></Item>
+                    </Array>
+                </Set>
+ 
+                <!-- Strict-Transport-Security -->
+                <Call name="addRule">
+                    <Arg>
+                        <New class="org.eclipse.jetty.rewrite.handler.HeaderPatternRule">
+                            <Set name="pattern">*</Set>
+                            <Set name="name">Strict-Transport-Security</Set>
+                            <Set name="value">max-age=15768000</Set>
+                        </New>
+                    </Arg>
+                </Call>
+ 
+                <!-- X-Content-Type-Options -->
+                <Call name="addRule">
+                    <Arg>
+                        <New class="org.eclipse.jetty.rewrite.handler.HeaderPatternRule">
+                            <Set name="pattern">*</Set>
+                            <Set name="name">X-Content-Type-Options</Set>
+                            <Set name="value">nosniff</Set>
+                        </New>
+                    </Arg>
+                </Call>
+ 
+                <!-- X-Xss-Protection -->
+                <Call name="addRule">
+                    <Arg>
+                        <New class="org.eclipse.jetty.rewrite.handler.HeaderPatternRule">
+                            <Set name="pattern">*</Set>
+                            <Set name="name">X-Xss-Protection</Set>
+                            <Set name="value">1; mode=block</Set>
+                        </New>
+                    </Arg>
+                </Call>
+ 
+                <!-- X-Frame-Options -->
+                <Call name="addRule">
+                    <Arg>
+                        <New class="org.eclipse.jetty.rewrite.handler.HeaderPatternRule">
+                            <Set name="pattern">*</Set>
+                            <Set name="name">X-Frame-Options</Set>
+                            <Set name="value">DENY</Set>
+                        </New>
+                    </Arg>
+                </Call>
+ 
+                <!-- Content-Security-Policy -->
+                <Call name="addRule">
+                    <Arg>
+                        <New class="org.eclipse.jetty.rewrite.handler.HeaderPatternRule">
+                            <Set name="pattern">*</Set>
+                            <Set name="name">Content-Security-Policy</Set>
+                            <Set name="value">default-src 'self'; style-src 'self'; script-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; frame-ancestors 'none'</Set>
+                        </New>
+                    </Arg>
+                </Call>
+ 
+                <!-- Referrer-Policy -->
+                <Call name="addRule">
+                    <Arg>
+                        <New class="org.eclipse.jetty.rewrite.handler.HeaderPatternRule">
+                            <Set name="pattern">*</Set>
+                            <Set name="name">Referrer-Policy</Set>
+                            <Set name="value">no-referrer-when-downgrade</Set>
+                        </New>
+                    </Arg>
+                </Call>
+ 
+            </New>
+        </Arg>
+    </Call>
+ 
+</Configure>
+```
+Možno stáhnout:
+```
+wget -O /opt/jetty11-idp/etc/jetty-rewrite.xml \
+    https://www.eduid.cz/jetty/jetty11-rewrite.xml
+```
+### Vytbvoření souboru pro systemd
+příkaz `systemctl edit --full --force jetty11.service`
+Nakopírovat:
+```
+[Unit]
+Description=Jetty 11 Web Application Server
+After=syslog.target network.target remote-fs.target nss-lookup.target
 
+[Service]
+
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+
+# Configuration
+Environment="JETTY_HOME=/opt/jetty11"
+Environment="JETTY_STATE=/opt/jetty11-idp/jetty11/jetty.state"
+Environment="JETTY_RUN=/opt/jetty11-idp/jetty11"
+Environment="JAVA_OPTS=-Djava.awt.headless=true"
+EnvironmentFile=-/opt/jetty11/default/jetty11
+
+# Security
+User=jetty
+Group=jetty
+PrivateTmp=yes
+NoNewPrivileges=true
+WorkingDirectory=/opt/jetty11-idp/
+LogsDirectory=jetty11
+LogsDirectoryMode=750
+ProtectSystem=strict
+ReadWritePaths=/opt/jetty11-idp/logs/
+ReadWritePaths=/opt/jetty11-idp/jetty11/
+TimeoutSec=infinity
+
+# Lifecycle
+Type=forking
+ExecStart=/opt/jetty11/bin/jetty.sh start
+PIDFile=/opt/jetty11-idp/jetty11/jetty.pid
+SuccessExitStatus=143
+Restart=on-abort
+
+# Logging
+SyslogIdentifier=jetty11
+
+[Install]
+WantedBy=multi-user.target
+```
+A praconí adresáře:
+```
+# Vytvoření složek pro jetty11
+mkdir /opt/jetty11-idp/{jetty11,logs}
+ 
+# Upravení práv složek
+chown jetty /opt/jetty11-idp/{jetty11,logs}
+ 
+# Vytvoření souboru stavu jetty
+touch /opt/jetty11-idp/jetty11/jetty.state
+chown jetty:jetty /opt/jetty11-idp/jetty11/jetty.state
+```
+### Modul rewrite
+```
+export JETTY_HOME=/opt/jetty11
+export JETTY_BASE=/opt/jetty11-idp
+cd $JETTY_HOME
+java -jar start.jar --add-modules=rewrite
+```
+
+### Restart
+```
+systemctl enable jetty11
+systemctl restart jetty11
+```
+
+### Test že je vše OK
+```
+ss -tlpn | fgrep java
+
+LISTEN  0  50  [::ffff:127.0.0.1]:80   *:*  users:(("java",pid=15630,fd=61))                                               
+LISTEN  0  50                   *:443  *:*  users:(("java",pid=15630,fd=55))                                               
+```
+Vyzkoušíme, jestli funguje přesměrování:
+```
+wget -S -O/dev/null http://localhost
+wget -S -O/dev/null https://`hostname -f`
+```
+### Nastavení firewallu
+```
+firewall-cmd --permanent --add-service=http
+firewall-cmd --permanent --add-service=https
+firewall-cmd --reload
+```
+A nebo pomocí `firewall-config`
+
+Hotovo
+
+## Shibboleth IdP
 
