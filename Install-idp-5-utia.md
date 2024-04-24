@@ -1,8 +1,8 @@
 # Instalace a konfigurace Shibboleth a Jetty pro UTIA AV ČR
 
 ## Server
-Minimální instalace Rocky 9, 2x CPU 4G RAM
-Po instalci standardní kroky pro atyp instalce, uodate, zákaz selinuxu, instalace potřebných věcí a javy
+Minimální instalace server Rocky 9, 2x CPU 4G RAM
+Po instalci standardní kroky pro atyp instalce, update, zákaz selinuxu, instalace potřebných věcí a javy
 ```
 yum -y update
 yum -y install java-17-openjdk.x86_64
