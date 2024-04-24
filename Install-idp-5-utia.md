@@ -465,4 +465,34 @@ A nebo pomocí `firewall-config`
 Hotovo
 
 ## Shibboleth IdP
-
+Stažení Idp ze serveru:
+```
+wget -P /opt  https://shibboleth.net/downloads/identity-provider/5.1.2/shibboleth-identity-provider-5.1.2.tar.gz https://shibboleth.net/downloads/identity-provider/5.1.2/shibboleth-identity-provider-5.1.2.tar.gz.asc https://shibboleth.net/downloads/identity-provider/5.1.2/shibboleth-identity-provider-5.1.2.tar.gz.sha256
+ls
+sha256sum shibboleth-identity-provider-5.1.2.tar.gz
+ls
+more shibboleth-identity-provider-5.1.2.tar.gz.sha256 
+ls
+mv shibboleth-identity-provider-5.1.2.tar.gz* src/
+cd src/
+tar -xzvf shibboleth-identity-provider-5.1.2.tar.gz
+```
+Pokud se bude dělat multiinstalace tak je nutné do souboru `webapp/WEB-INF/web.xml` doplnit magický kód:
+```
+<context-param>
+    <param-name>idp.home</param-name>
+    <param-value>/opt/idp/idp.utia.cas.cz</param-value>
+</context-param>
+```
+Buďto v editoru nebo příkazem:
+```
+cd shibboleth-identity-provider-5.1.2
+sed "/<display-name>Shibboleth Identity Provider.*/a <context-param>\n\t\t<param-name>idp.home<\/param-name>\n\t\t<param-value>/opt/idp/idp.utia.cas.cz<\/param-value>\n\t</context-param>" webapp/WEB-INF/web.xml > webapp/WEB-INF/web.xml.new
+mv webapp/WEB-INF/web.xml webapp/WEB-INF/web.xml.bak
+cp webapp/WEB-INF/web.xml.new webapp/WEB-INF/web.xml
+```
+Spuštění instalace
+```
+mkdir /opt/idp
+./bin/install.sh 
+```
