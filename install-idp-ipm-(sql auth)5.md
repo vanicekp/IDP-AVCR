@@ -1,4 +1,4 @@
-# Instalace a konfigurace Shibboleth a Jetty pro UTIA AV ČR
+# Instalace a konfigurace Shibboleth a Jetty pro IPM AV ČR
 
 ## Server
 Minimální instalace server Rocky 9, 2x CPU 4G RAM
@@ -542,9 +542,95 @@ idp.storage.htmlLocalStorage = false
 
 
 ### ldap.properties
-
-Dopíšu později
+Není třeba
 
 ### secrets.properties
+```
+vi credentials/secrets.properties
 
+idp.persistentId.salt = ___SŮL_PRO_GENEROVÁNÍ_IDENTIFIKÁTORŮ___
+```
+### metadata-providers.xml
+Do souboru `conf/metadata-providers.xml` se přidá následující vkládá se před poslední tag </MetadataProvider>:
 
+```
+<!-- eduID.cz -->
+<MetadataProvider
+    id="eduidcz"
+    xsi:type="FileBackedHTTPMetadataProvider"
+    backingFile="%{idp.home}/metadata/eduidcz.xml"
+    metadataURL="https://metadata.eduid.cz/entities/eduid+sp"
+    maxRefreshDelay="PT30M">
+ 
+    <MetadataFilter
+        xsi:type="SignatureValidation"
+        requireSignedRoot="true"
+        certificateFile="%{idp.home}/credentials/metadata.eduid.cz.crt.pem" />
+ 
+    <MetadataFilter
+        xsi:type="RequiredValidUntil"
+        maxValidityInterval="P30D" />
+ 
+</MetadataProvider>
+ 
+<!-- eduGAIN -->
+<MetadataProvider
+    id="edugain"
+    xsi:type="FileBackedHTTPMetadataProvider"
+    backingFile="%{idp.home}/metadata/edugain.xml"
+    metadataURL="https://metadata.eduid.cz/entities/edugain+sp"
+    maxRefreshDelay="PT30M">
+ 
+    <MetadataFilter
+        xsi:type="SignatureValidation"
+        requireSignedRoot="true"
+        certificateFile="%{idp.home}/credentials/metadata.eduid.cz.crt.pem" />
+ 
+    <MetadataFilter
+        xsi:type="RequiredValidUntil"
+        maxValidityInterval="P30D" />
+ 
+</MetadataProvider>
+```
+Dále staneme klíče k podpisu metadat:
+```
+wget -P credentials \
+    https://www.eduid.cz/docs/eduid/metadata/metadata.eduid.cz.crt.pem
+```
+
+### attribute-resolver.xml
+
+Pozdeji
+
+### cesnetAttributes.xml
+```
+wget -O conf/attributes/cesnetAttributes.xml \
+    https://www.eduid.cz/shibboleth-idp/cesnetAttributes.xml
+```
+
+### default-rules.xml
+Doplníme o řádek `<import resource="cesnetAttributes.xml" />`
+
+a nebo
+```
+wget -O conf/attributes/default-rules.xml \
+    https://www.eduid.cz/shibboleth-idp/default-rules.xml
+```
+
+### eduPerson.xml
+```
+wget -O conf/attributes/eduPerson.xml \
+    https://www.eduid.cz/shibboleth-idp/eduPerson.xml
+```
+
+### inetOrgPerson.xml
+```
+wget -O conf/attributes/inetOrgPerson.xml \
+    https://www.eduid.cz/shibboleth-idp/inetOrgPerson.xml
+```
+
+### attribute-filter.xml
+```
+wget -O conf/attribute-filter.xml \
+    https://www.eduid.cz/shibboleth-idp/attribute-filter.xml
+```
