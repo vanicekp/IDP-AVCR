@@ -787,6 +787,28 @@ Přidání doplňků a potvrdíme dvakrát pomocí y a enter.
 ./bin/plugin.sh -I net.shibboleth.plugin.storage.jdbc
 ./bin/plugin.sh -I net.shibboleth.idp.plugin.nashorn
 ```
+### Úprava /opt/jetty11-idp/webapps/idp.xml
+Změnit soubor na:
+
+```
+vi /opt/jetty11-idp/webapps/idp.xml
+
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://www.eclipse.org/jetty/configure_9_3.dtd">
+
+<Configure class="org.eclipse.jetty.webapp.WebAppContext">
+    <Set name="war"><SystemProperty name="idp.war.path" default="/opt/idp/idp.ipm.cas.cz/war/idp.war" /></Set>
+    <Set name="contextPath"><SystemProperty name="idp.context.path" default="/idp" /></Set>
+    <Set name="virtualHosts">
+     <Array type="java.lang.String">
+      <Item>idp.ipm.cas.cz</Item>
+     </Array>
+     </Set>
+    <Set name="extractWAR">false</Set>
+    <Set name="copyWebDir">false</Set>
+    <Set name="copyWebInf">true</Set>
+</Configure>
+```
 
 ## Test
 V souboru `conf/access-control.xml` odkomentovat blok a změnit jmeno uživatele
