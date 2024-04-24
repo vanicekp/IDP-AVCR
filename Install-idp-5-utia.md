@@ -666,6 +666,443 @@ Do souboru `conf/metadata-providers.xml` se přidá následující vkládá se p
 
 Dále staneme klíče k podpisu metadat:
 ```
-wget -P /opt/shibboleth-idp/credentials \
+wget -P credentials \
     https://www.eduid.cz/docs/eduid/metadata/metadata.eduid.cz.crt.pem
 ```
+
+### attribute-resolver.xml
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<AttributeResolver
+    xmlns="urn:mace:shibboleth:2.0:resolver"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="urn:mace:shibboleth:2.0:resolver http://shibboleth.net/schema/idp/shibboleth-attribute-resolver.xsd">
+
+    <!-- ========================================== -->
+    <!--      Attribute Definitions                 -->
+    <!-- ========================================== -->
+
+<AttributeDefinition id="eduPersonPrincipalName" xsi:type="ScriptedAttribute">
+    <InputDataConnector ref="myLDAP"  attributeNames="pager uid"/>
+    <Script><![CDATA[
+logger = Java.type("org.slf4j.LoggerFactory").getLogger("net.shibboleth.idp.attribute.resolver.eppnbuilder");
+scopedValueType =  Java.type("net.shibboleth.idp.attribute.ScopedStringAttributeValue");
+var localpart = "";
+if (typeof pager == "undefined" || pager.getValues().size() < 1) {
+    logger.debug("No pager in LDAP found, creating uid");
+    localpart = uid.getValues().get(0);
+} else {
+    logger.debug("pager in LDAP found");
+    localpart = pager.getValues().get(0);
+}
+eduPersonPrincipalName.addValue(new scopedValueType(localpart, "%{idp.scope}"));
+logger.debug("ePPN final value: " + eduPersonPrincipalName.getValues().get(0));
+    ]]>
+</Script>
+</AttributeDefinition>
+
+<!-- mail -->
+    <AttributeDefinition xsi:type="Simple" id="mail">
+        <InputDataConnector ref="myLDAP" attributeNames="mail"/>
+    </AttributeDefinition>
+
+<!-- eduPersonAffiliation -->
+    <AttributeDefinition xsi:type="Simple" id="eduPersonAffiliation">
+        <InputDataConnector ref="staticAttributes" attributeNames="eduPersonAffiliation"/>
+    </AttributeDefinition>
+
+<!-- eduPersonScopedAffiliation -->
+    <AttributeDefinition xsi:type="Scoped" id="eduPersonScopedAffiliation" scope="%{idp.scope}">
+        <InputDataConnector ref="staticAttributes" attributeNames="eduPersonAffiliation"/>
+    </AttributeDefinition>
+
+<!-- givenName -->
+    <AttributeDefinition xsi:type="Simple" id="givenName">
+        <InputDataConnector ref="myLDAP" attributeNames="givenName"/>
+    </AttributeDefinition>
+
+<!-- sn -->
+    <AttributeDefinition xsi:type="Simple" id="sn">
+        <InputDataConnector ref="myLDAP" attributeNames="sn"/>
+    </AttributeDefinition>
+
+<!-- displayName -->
+   <AttributeDefinition xsi:type="Template" id="displayName">
+      <InputDataConnector ref="myLDAP" attributeNames="givenName sn"/>
+        <Template>${givenName} ${sn}</Template>
+    </AttributeDefinition>
+
+<!-- commonName -->
+    <AttributeDefinition xsi:type="Template" id="cn">
+        <InputDataConnector ref="myLDAP" attributeNames="givenName sn"/>
+        <Template>${givenName} ${sn}</Template>
+    </AttributeDefinition>
+
+<!-- commonName#ASCII pro TCS-P -->
+    <AttributeDefinition xsi:type="ScriptedAttribute" id="commonNameASCII">
+        <InputAttributeDefinition ref="cn" />
+        <Script>
+        <![CDATA[
+            load("nashorn:mozilla_compat.js");
+
+            importPackage(Packages.edu.internet2.middleware.shibboleth.common.attribute.provider);
+            importPackage(Packages.java.lang);
+            importPackage(Packages.java.text);
+
+            if(cn.getValues().size() > 0) {
+                originalValue = cn.getValues().get(0);
+                asciiValue = Normalizer.normalize(originalValue, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+                commonNameASCII.getValues().add(asciiValue);
+            }
+        ]]>
+        </Script>
+    </AttributeDefinition>
+
+<!-- employeeNumber -->
+    <AttributeDefinition xsi:type="Simple" id="employeeNumber">
+        <InputDataConnector ref="myLDAP" attributeNames="employeeNumber"/>
+    </AttributeDefinition>
+
+<!-- unstructuredName pro TCS-P -->
+    <AttributeDefinition xsi:type="Mapped" id="unstructuredName">
+        <InputDataConnector ref="myLDAP" attributeNames="employeeNumber"/>
+        <ValueMap>
+            <ReturnValue>$1</ReturnValue>
+            <SourceValue>15(.+)</SourceValue>
+        </ValueMap>
+    </AttributeDefinition>
+
+<!-- eduPersonUniqueId -->
+<AttributeDefinition id="eduPersonUniqueId" xsi:type="Scoped" scope="%{idp.scope}">
+    <InputAttributeDefinition ref="unstructuredName" />
+</AttributeDefinition>
+
+<!-- uniqueIdentifier -->
+    <AttributeDefinition xsi:type="Simple"  id="uniqueIdentifier">
+        <InputDataConnector ref="staticAttributes" attributeNames="uniqueIdentifier"/>
+    </AttributeDefinition>
+
+<!-- eduPersonEntitlement pro TCS-P -->
+   <AttributeDefinition xsi:type="ScriptedAttribute" id="eduPersonEntitlement" >
+       <InputAttributeDefinition ref="unstructuredName" />
+       <InputAttributeDefinition ref="uniqueIdentifier" />
+        <ScriptFile>/opt/idp/common/script/eduPersonEntitlementUtia.js</ScriptFile>
+    </AttributeDefinition>
+
+<!-- mail  pro TCS-P -->
+    <AttributeDefinition xsi:type="Simple" id="authMail">
+        <InputDataConnector ref="myLDAP" attributeNames="mail"/>
+    </AttributeDefinition>
+
+<!-- organizationName -->
+     <AttributeDefinition id="organizationName" xsi:type="Simple">
+        <InputDataConnector ref="staticAttributes" attributeNames="organizationName"/>
+     </AttributeDefinition>
+
+<!-- schacHomeOrg -->
+    <AttributeDefinition xsi:type="Simple" id="schacHomeOrganization">
+        <InputDataConnector ref="staticAttributes" attributeNames="schacHomeOrganization"/>
+    </AttributeDefinition>
+
+<!-- eduPersonTargetedID -->
+    <AttributeDefinition xsi:type="SAML2NameID" id="eduPersonTargetedID" nameIdFormat="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent">
+        <InputDataConnector ref="myStoredId" attributeNames="storedId" />
+        <AttributeEncoder xsi:type="SAML2XMLObject" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.10"/>
+    </AttributeDefinition>
+
+<!-- samlPairwiseID-->
+    <AttributeDefinition xsi:type="Scoped" id="samlPairwiseID" scope="%{idp.scope}">
+        <InputDataConnector ref="computed" attributeNames="computedId"/>
+    </AttributeDefinition>
+
+<!-- samlSubjectHash -->
+    <AttributeDefinition xsi:type="ScriptedAttribute" id="samlSubjectHash" dependencyOnly="true">
+        <InputAttributeDefinition ref="unstructuredName"/>
+        <Script>
+            <![CDATA[
+                if (typeof unstructuredName != "undefined" && unstructuredName != "null" && unstructuredName.getValues().size()) {
+                    var digestUtils = Java.type("org.apache.commons.codec.digest.DigestUtils");
+                    var saltedHash = digestUtils.sha256Hex(unstructuredName.getValues().get(0) + "%{idp.persistentId.salt}");
+                    samlSubjectHash.addValue(saltedHash);
+                }
+            ]]>
+        </Script>
+    </AttributeDefinition>
+
+<!-- samlSubjectID-->
+    <AttributeDefinition xsi:type="Scoped" id="samlSubjectID" scope="%{idp.scope}">
+        <InputAttributeDefinition ref="samlSubjectHash"/>
+    </AttributeDefinition>
+    
+
+<!-- telephoneNumber -->
+    <AttributeDefinition xsi:type="Mapped" id="telephoneNumber">
+        <InputDataConnector ref="mySQL" attributeNames="telephoneNumber"/>
+
+        <DefaultValue passThru="true"/>
+
+    <ValueMap>
+        <ReturnValue>26605$1</ReturnValue>
+        <SourceValue>(.+)</SourceValue>
+    </ValueMap>
+    </AttributeDefinition>
+<!-- 
+    <AttributeDefinition xsi:type="Simple" id="telephoneNumber">
+        <InputDataConnector ref="myLDAP" attributeNames="telephoneNumber"/>
+    </AttributeDefinition>
+-->
+<!-- uid -->
+    <AttributeDefinition xsi:type="Simple" id="uid">
+        <InputDataConnector ref="myLDAP" attributeNames="uid"/>
+    </AttributeDefinition>
+
+<!-- eduPersonAssurance -->
+<AttributeDefinition xsi:type="Simple" id="eduPersonAssurance">
+    <InputDataConnector ref="staticAttributes" attributeNames="eduPersonAssurance" />
+</AttributeDefinition>
+
+
+
+    <!-- ========================================== -->
+    <!--      Data Connectors                       -->
+    <!-- ========================================== -->
+
+    <!-- Static Connector -->
+<DataConnector id="staticAttributes" xsi:type="Static">
+    <Attribute id="organizationName">
+        <Value>UTIA AV CR v.v.i.</Value>
+    </Attribute>
+       <Attribute id="eduPersonAffiliation">
+            <Value>staff</Value>
+            <Value>employee</Value>
+            <Value>member</Value>
+        </Attribute>
+    <Attribute id="schacHomeOrganization">
+        <Value>%{idp.scope}</Value>
+    </Attribute>
+        <Attribute id="uniqueIdentifier">
+            <Value>EduID</Value>
+        </Attribute>
+     <Attribute id="eduPersonAssurance">
+        <Value>https://refeds.org/assurance/ID/eppn-unique-no-reassign</Value>
+        <Value>https://refeds.org/assurance/IAP/high</Value>
+    </Attribute>
+</DataConnector>
+
+
+    <!-- LDAP Connector -->
+    <!-- exportAttributes="cesnetEmplID" -->
+    <DataConnector id="myLDAP" xsi:type="LDAPDirectory"
+        ldapURL="%{idp.attribute.resolver.LDAP.ldapURL}"
+        baseDN="%{idp.attribute.resolver.LDAP.baseDN}" 
+        principal="%{idp.attribute.resolver.LDAP.bindDN}"
+        principalCredential="%{idp.attribute.resolver.LDAP.bindDNCredential}"
+        useStartTLS="%{idp.attribute.resolver.LDAP.useStartTLS:true}"
+        connectTimeout="%{idp.attribute.resolver.LDAP.connectTimeout}"
+        trustFile="%{idp.attribute.resolver.LDAP.trustCertificates}"
+        responseTimeout="%{idp.attribute.resolver.LDAP.responseTimeout}"
+        connectionStrategy="%{idp.attribute.resolver.LDAP.connectionStrategy}"
+        noResultIsError="true"
+        multipleResultsIsError="true"
+        excludeResolutionPhases="c14n/attribute">
+        <FilterTemplate>
+            <![CDATA[
+                %{idp.attribute.resolver.LDAP.searchFilter}
+            ]]>
+        </FilterTemplate>
+        <ConnectionPool
+            minPoolSize="%{idp.pool.LDAP.minSize:3}"
+            maxPoolSize="%{idp.pool.LDAP.maxSize:10}"
+            blockWaitTime="%{idp.pool.LDAP.blockWaitTime:PT3S}"
+            validatePeriodically="%{idp.pool.LDAP.validatePeriodically:true}"
+            validateTimerPeriod="%{idp.pool.LDAP.validatePeriod:PT5M}"
+            validateDN="%{idp.pool.LDAP.validateDN:}"
+            validateFilter="%{idp.pool.LDAP.validateFilter:(objectClass=*)}"
+            expirationTime="%{idp.pool.LDAP.idleTime:PT10M}"/>
+    </DataConnector>
+
+    <!-- StoredID Data Connector -->
+    <DataConnector id="myStoredId"
+        xsi:type="StoredId"
+        generatedAttributeID="storedId"
+        salt="%{idp.persistentId.salt}"
+        queryTimeout="0">
+        <InputAttributeDefinition ref="%{idp.persistentId.sourceAttribute}"/>
+        <BeanManagedConnection>shibboleth.MySQLDataSource</BeanManagedConnection>
+    </DataConnector>
+
+    <DataConnector id="computed"
+        xsi:type="ComputedId"
+        excludeResolutionPhases="c14n/attribute"
+        generatedAttributeID="computedId"
+        salt="%{idp.persistentId.salt}"
+        algorithm="%{idp.persistentId.algorithm:SHA}"
+        encoding="%{idp.persistentId.encoding:BASE32}">
+        <InputAttributeDefinition ref="unstructuredName"/>
+    </DataConnector>
+
+<!-- MySQL Data Connector -->
+<DataConnector id="mySQL"
+    xsi:type="RelationalDatabase">
+
+<!--   <ApplicationManagedConnection -->
+   <SimpleManagedConnection
+        jdbcDriver="org.mariadb.jdbc.Driver"
+        jdbcURL="jdbc:mysql://localhost:3306/shibboleth"
+        jdbcUserName="shibboleth"
+        jdbcPassword="XXXXXXX"/>
+
+        <QueryTemplate>
+            <![CDATA[
+                SELECT * FROM export_telefony WHERE name='$resolutionContext.principal'
+            ]]>
+        </QueryTemplate>
+
+        <Column columnName="field_linka_value" attributeID="telephoneNumber" />
+
+</DataConnector>
+
+
+
+</AttributeResolver>
+
+
+```
+### cesnetAttributes.xml
+```
+wget -O conf/attributes/cesnetAttributes.xml \
+    https://www.eduid.cz/shibboleth-idp/cesnetAttributes.xml
+```
+
+### default-rules.xml
+Doplníme o řádek `<import resource="cesnetAttributes.xml" />`
+
+a nebo
+```
+wget -O conf/attributes/default-rules.xml \
+    https://www.eduid.cz/shibboleth-idp/default-rules.xml
+```
+
+### eduPerson.xml
+```
+wget -O conf/attributes/eduPerson.xml \
+    https://www.eduid.cz/shibboleth-idp/eduPerson.xml
+```
+
+### inetOrgPerson.xml
+```
+wget -O conf/attributes/inetOrgPerson.xml \
+    https://www.eduid.cz/shibboleth-idp/inetOrgPerson.xml
+```
+
+### attribute-filter.xml
+```
+wget -O conf/attribute-filter.xml \
+    https://www.eduid.cz/shibboleth-idp/attribute-filter.xml
+```
+
+### idp-metadata.xml
+
+**Zatím ponechat bez zázahu**
+
+
+### global.xml
+Definice beanu pro přístup do mariadb.
+
+```
+vi conf/global.xml
+
+<bean id="shibboleth.MySQLDataSource"
+    class="org.apache.commons.dbcp2.BasicDataSource"
+    p:driverClassName="org.mariadb.jdbc.Driver"
+    p:url="jdbc:mysql://localhost:3306/shibboleth"
+    p:username="shibboleth"
+    p:password="___SILNE_HESLO___" />
+ 
+    <bean id="JDBCStorageService" parent="shibboleth.JDBCStorageService"
+          p:dataSource-ref="shibboleth.MySQLDataSource"
+          p:transactionIsolation="4"
+          p:retryableErrors="40001"
+     />
+ 
+    <bean id="shibboleth.JPAStorageService"
+        parent="shibboleth.JDBCStorageService"
+        p:cleanupInterval="%{idp.storage.cleanupInterval:PT10M}"
+        p:dataSource-ref="shibboleth.MySQLDataSource"/>
+```
+
+### saml-nameid.properties
+Upravíme a doplníme
+
+```
+vi conf/saml-nameid.properties
+
+#idp.persistentId.sourceAttribute = uid
+# Nové IdP (BASE32)
+#idp.persistentId.encoding = BASE32
+# Migrované IdP (BASE64)
+idp.persistentId.encoding = BASE64
+idp.persistentId.generator = shibboleth.StoredPersistentIdGenerator
+idp.persistentId.dataSource = shibboleth.MySQLDataSource
+idp.persistentId.sourceAttribute = eduPersonPrincipalName
+
+```
+
+### saml-nameid.xml
+odkomentovat v souboru řádek
+
+```
+vi conf/saml-nameid.xml
+
+<ref bean="shibboleth.SAML2PersistentGenerator" />
+```
+
+### subject-c14n.xml
+Odkomentujeme tedy řádek: 
+```
+vi conf/c14n/subject-c14n.xml
+
+<ref bean="c14n/SAML2Persistent" />
+```
+
+### messages_cs.properties
+Český překlad hlášek
+```
+wget https://shibboleth.atlassian.net/wiki/download/attachments/1265631751/messages_cs.properties \
+    -O messages/messages_cs.properties
+```
+## Spuštění
+opravíme práva v adresáři 
+```
+chown jetty {logs,metadata}
+chgrp -R jetty {conf,credentials}
+chmod -R g+r conf
+chmod 750 credentials
+chmod 640 credentials/*
+```
+ V systemd musíme Jetty povolit přístup pro zápis do adresářů s logy a metadaty. 
+```
+systemctl edit jetty11
+```
+přidáme
+```
+[Service]
+ReadWritePaths=/opt/idp/idp.utia.cas.cz/logs/
+ReadWritePaths=/opt/idp/idp.utia.cas.cz/metadata/
+```
+Přidání doplňků a potvrdíme dvakrát pomocí y a enter. 
+```
+./bin/plugin.sh -I net.shibboleth.plugin.storage.jdbc
+./bin/plugin.sh -I net.shibboleth.idp.plugin.nashorn
+```
+ Zbývá jen znovu načíst konfiguraci pro službu Jetty a tu následně restartovat:
+
+Restart Jetty
+```
+systemctl daemon-reload
+systemctl restart jetty11
+```
+
+
+
