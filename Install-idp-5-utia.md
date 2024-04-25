@@ -1143,3 +1143,23 @@ V souboru `conf/access-control.xml` odkomentovat blok a změnit jmeno uživatele
 ```
 
 Potom na URL `https://idp.ipm.cas.cz/idp/profile/admin/hello` je cvičné přihlašovátko
+
+## Dokončení instalace
+Je třeba nakopírovat logo do `edit-webapp/images/` a vyplnit položky v `messages/messages_cs.properties` a v `messages/messages.properties`.
+Konkrétně:
+```
+dp.title = UTIA Web Login Service
+idp.logo = /images/utia+av.png
+idp.logo.alt-text = UTIA Logo
+idp.footer = IDP UTIA AV ČR, provozuje IT UTIA AV ČR
+root.footer = IDP UTIA AV ČR, provozuje IT UTIA AV ČR
+idp.url.password.reset=https://lily.utia.cas.cz/
+idp.url.helpdesk=http://www.utia.cas.cz/cs/eduid
+```
+
+Dále v `views/login.vm` případně doplnit informační texty či to jinak upravit.
+V případě ÚTIA doplněn jen informační text.
+
+## Zálohováni, wazuh a nagios
+
+
