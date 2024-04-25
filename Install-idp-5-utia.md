@@ -1160,6 +1160,50 @@ idp.url.helpdesk=http://www.utia.cas.cz/cs/eduid
 Dále v `views/login.vm` případně doplnit informační texty či to jinak upravit.
 V případě ÚTIA doplněn jen informační text.
 
+Asi nutný restart jetty.
+
+## Vypnutí modulu HELLO (i zapnutí)
+
+Vypnutí
+```
+# Vypnutí modulu Hello
+/opt/shibboleth-idp/bin/module.sh -d idp.admin.Hello
+ 
+# Restartování Jetty
+systemctl restart jetty11
+```
+Zapnutí
+```
+# Zapnutí modulu Hello
+/opt/shibboleth-idp/bin/module.sh -e idp.admin.Hello
+
+Nyní zbývá nastavit uživatele, který se bude moci k tomuto diagnostickému modulu přihlásit. To se konfiguruje v souboru conf/access-control.xml ve volbě AccessByAdminUser, kde je ve výchozím nastavení hodnota jdoe (tato hodnota odpovídá přihlašovacímu jménu):
+
+<entry key="AccessByAdminUser">
+  <bean parent="shibboleth.PredicateAccessControl">
+    <constructor-arg>
+      <bean parent="shibboleth.Conditions.SubjectName" c:collection="#{'jdoe'}" />
+    </constructor-arg>
+  </bean>
+</entry>
+
+systemctl restart jetty11
+```
+
+## Přesun metadat
+Ze starého IdP je třeba zkopírovat následující soubory na správná místa, originály raději zálohovat.
+```
+./credentials/idp-signing.key
+./credentials/idp-signing.crt
+./credentials/idp-encryption.key
+./credentials/idp-encryption.crt
+
+./metadata/idp-metadata.xml
+```
+
+## Loga
+Ze starého IdP přesunout adresář v prostoru jetty `/opt/jetty/webapps/root/loga` na nový server `/opt/jetty11-idp/webapps/root/loga`.
+Dále případně přesunout ikonky do login řádku aka `favicon.ico`, z `/opt/jetty/webapps/root` do `/opt/jetty11-idp/webapps/root`
 ## Zálohováni, wazuh a nagios
 
 
