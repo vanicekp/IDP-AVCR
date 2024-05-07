@@ -1206,4 +1206,13 @@ Ze starého IdP přesunout adresář v prostoru jetty `/opt/jetty/webapps/root/l
 Dále případně přesunout ikonky do login řádku aka `favicon.ico`, z `/opt/jetty/webapps/root` do `/opt/jetty11-idp/webapps/root`
 ## Zálohováni, wazuh a nagios
 
-
+## Cotntens
+Nastavení contens (potvrzení odeslání atributů)
+Zapnutí modulu  idp.intercept.Consent
+```
+./bin/module.sh -e idp.intercept.Consent
+```
+A v souboru `conf/relying-party.xml` je třeba na řádku 46 změnit `<ref bean="SAML2.SSO" />` za
+```
+<bean parent="SAML2.SSO" p:postAuthenticationFlows="attribute-release" />
+```
