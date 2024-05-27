@@ -1139,3 +1139,48 @@ A v souboru `conf/relying-party.xml` je třeba na řádku 46 změnit `<ref bean=
 ```
 <bean parent="SAML2.SSO" p:postAuthenticationFlows="attribute-release" />
 ```
+
+### Prodloužení platnosti přihlášení
+V souboru ` /opt/shibboleth-idp/conf/idp.properties` se změní a odkomentuje:
+```
+# conf/idp.properties
+idp.session.timeout           = PT12H
+idp.session.defaultSPlifetime = PT12H
+```
+A v souboru  `conf/authn/authn.properties`
+```
+# conf/authn/authn.properties
+idp.authn.defaultLifetime     = PT12H
+idp.authn.defaultTimeout      = PT12H
+```
+
+### Schování a třídění atributů v strácue Contens
+Soubor `conf/intercept/consent-intercept-config.xml` se změní dvě věci:
+Element `shibboleth.consent.attribute-release.AttributeDisplayOrder` se odkomentuje a doplní o:
+```
+<util:list id="shibboleth.consent.attribute-release.AttributeDisplayOrder">
+    <value>givenName</value>
+    <value>sn</value>
+    <value>cn</value>
+    <value>commonNameASCII</value>
+    <value>displayName</value>
+    <value>telephoneNumber</value>
+    <value>authMail</value>
+    <value>mail</value>
+    <value>eduPersonPrincipalName</value>
+    <value>unstructuredName</value>
+    <value>eduPersonUniqueId</value>
+    <value>o</value>
+    <value>ou</value>
+    <value>schacHomeOrganization</value>
+</util:list>
+```
+a element `shibboleth.consent.attribute-release.IgnoredAttributeIDs` doplní:
+```
+<util:list id="shibboleth.consent.attribute-release.IgnoredAttributeIDs">
+    <value>transientId</value>
+    <value>persistentId</value>
+    <value>eduPersonTargetedID</value>
+    <value>eduPersonEntitlement</value>
+</util:list>
+```
