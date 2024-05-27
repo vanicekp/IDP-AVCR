@@ -1216,3 +1216,17 @@ A v souboru `conf/relying-party.xml` je třeba na řádku 46 změnit `<ref bean=
 ```
 <bean parent="SAML2.SSO" p:postAuthenticationFlows="attribute-release" />
 ```
+
+### Prodloužení platnosti přihlášení
+V souboru ` /opt/shibboleth-idp/conf/idp.properties` se změní a odkomentuje:
+```
+# conf/idp.properties
+idp.session.timeout           = PT12H
+idp.session.defaultSPlifetime = PT12H
+```
+A v souboru  `conf/authn/authn.properties`
+```
+# conf/authn/authn.properties
+idp.authn.defaultLifetime     = PT12H
+idp.authn.defaultTimeout      = PT12H
+```
